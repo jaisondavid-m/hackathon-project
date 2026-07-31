@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock } from 'lucide-react';
+import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock, ClipboardList, UserCheck } from 'lucide-react';
 
 function Sidebar({ user, mobileOpen, onCloseMobile }) {
   const location = useLocation();
@@ -18,6 +18,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     if (path.includes('/admin/audit-logs')) return 'audit';
     if (path.includes('/faculty/otp')) return 'otp';
     if (path.includes('/faculty/timetable')) return 'timetable';
+    if (path.includes('/faculty/my-attendance')) return 'my-attendance';
     if (path.includes('/student/otp')) return 'student-otp';
     if (path.includes('/student/history')) return 'student-history';
     return '';
@@ -35,11 +36,12 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
       { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
     ],
     faculty: [
-      { id: 'otp', path: '/faculty/otp', label: 'Attendance', icon: Key },
+      { id: 'otp', path: '/faculty/otp', label: 'Attendance', icon: ClipboardList },
       { id: 'timetable', path: '/faculty/timetable', label: 'Time Table', icon: Calendar },
+      { id: 'my-attendance', path: '/faculty/my-attendance', label: 'My Attendance', icon: UserCheck },
     ],
     student: [
-      { id: 'student-otp', path: '/student/otp', label: 'Mark Attendance', icon: Key },
+      { id: 'student-otp', path: '/student/otp', label: 'Mark Attendance', icon: UserCheck },
       { id: 'student-history', path: '/student/history', label: 'Attendance History', icon: Layers },
     ],
   };

@@ -12,6 +12,7 @@ import AuditLogs from '../pages/admin/AuditLogs';
 import FacultyDashboard from '../pages/faculty/FacultyDashboard';
 import OTPGeneration from '../pages/faculty/OTPGeneration';
 import FacultyTimeTable from '../pages/faculty/FacultyTimeTable';
+import FacultyAttendance from '../pages/faculty/FacultyAttendance';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import OTPAttendance from '../pages/student/OTPAttendance';
 import StudentHistory from '../pages/student/StudentHistory';
@@ -46,6 +47,7 @@ function DashboardLayout({ user, onLogout }) {
     if (path.includes('/admin/audit-logs')) return 'Audit Logs';
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
     if (path.includes('/faculty/timetable')) return 'Time Table';
+    if (path.includes('/faculty/my-attendance')) return 'My Attendance';
     if (path.includes('/student/otp')) return 'Mark Attendance';
     if (path.includes('/student/history')) return 'Attendance History';
     return 'Dashboard';
@@ -183,6 +185,7 @@ function App() {
             <Route index element={<Navigate to="otp" replace />} />
             <Route path="otp" element={<OTPGeneration />} />
             <Route path="timetable" element={<FacultyTimeTable />} />
+            <Route path="my-attendance" element={<FacultyAttendance />} />
           </Route>
         </Route>
         
