@@ -35,13 +35,38 @@ type AttendanceRecord struct {
 }
 
 type CreateSessionRequest struct {
-	ClassID    string `json:"class_id" binding:"required"`
+	ClassID    string `json:"class_id"`
 	HourNumber int    `json:"hour_number" binding:"required,min=1,max=7"`
-	VenueID    uint   `json:"venue_id" binding:"required"`
+	VenueID    uint   `json:"venue_id"`
 }
 
 type SubmitOTPRequest struct {
 	OTP       string  `json:"otp" binding:"required,len=6"`
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
+}
+
+type OtpMapping struct {
+	ID           uint                 `gorm:"primaryKey" json:"id"`
+	FacultyEmail string               `gorm:"size:255;not null" json:"faculty_email"`
+	FacultyName  string               `gorm:"size:255" json:"faculty_name"`
+	ClassID      string               `gorm:"size:255;not null" json:"class_id"`
+	ClassName    string               `gorm:"size:255" json:"class_name"`
+	VenueID      uint                 `gorm:"not null" json:"venue_id"`
+	VenueName    string               `gorm:"size:255" json:"venue_name"`
+	Students     []OtpMappingStudent  `gorm:"foreignKey:MappingID;constraint:OnDelete:CASCADE" json:"students"`
+}
+
+type OtpMappingStudent struct {
+	ID           uint   `gorm:"primaryKey" json:"id"`
+	MappingID    uint   `gorm:"not null" json:"mapping_id"`
+	StudentEmail string `gorm:"size:255;not null" json:"student_email"`
+	StudentName  string `gorm:"size:255" json:"student_name"`
+}
+
+type CreateOtpMappingRequest struct {
+	FacultyEmail  string   `json:"faculty_email" binding:"required"`
+	ClassID       string   `json:"class_id" binding:"required"`
+	VenueID       uint     `json:"venue_id" binding:"required"`
+	StudentEmails []string `json:"student_emails" binding:"required"`
 }

@@ -94,6 +94,9 @@ func main() {
 			adminOnly.POST("/holidays/batch", configController.SaveHolidayBatch)
 			adminOnly.POST("/venues", venueController.CreateVenue)
 			adminOnly.PUT("/venues/:id", venueController.UpdateVenue)
+			adminOnly.GET("/otp-mappings", configController.GetOtpMappings)
+			adminOnly.POST("/otp-mappings", configController.CreateOtpMapping)
+			adminOnly.DELETE("/otp-mappings/:id", configController.DeleteOtpMapping)
 			adminOnly.GET("/audit-logs", auditController.GetAuditLogs)
 		}
 	}

@@ -193,3 +193,138 @@ func (cc *ConfigController) SaveHolidayBatch(c *gin.Context) {
 
 	c.JSON(http.StatusOK, savedConfigs)
 }
+
+// GetOtpMappings retrieves all mapped student permissions
+func (cc *ConfigController) GetOtpMappings(c *gin.Context) {
+	var mappings []models.OtpMapping
+	if err := cc.DB.Preload("Students").Find(&mappings).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve mappings"})
+		return
+	}
+	c.JSON(http.StatusOK, mappings)
+}
+
+// CreateOtpMapping creates/updates a student class-venue permission mapping
+func (cc *ConfigController) CreateOtpMapping(c *gin.Context) {
+	var req models.CreateOtpMappingRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if req.FacultyEmail == "" || req.ClassID == "" || req.VenueID == 0 || len(req.StudentEmails) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "faculty_email, class_id, venue_id, and student_emails are required fields"})
+		return
+	}
+
+	// Fetch faculty details
+	var faculty models.User
+	if err := cc.DB.Where("emailid = ? AND role = ?", req.FacultyEmail, "faculty").First(&faculty).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Faculty with email " + req.FacultyEmail + " not found"})
+		return
+	}
+
+	// Fetch venue details
+	var venue models.Venue
+	if err := cc.DB.First(&venue, req.VenueID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Selected venue does not exist"})
+		return
+	}
+
+	// Map classes
+	classes := map[string]string{
+		"CS101": "Computer Science (CS-A)",
+		"CS202": "Data Structures (CS-B)",
+		"CS305": "Web Engineering",
+	}
+	className := classes[req.ClassID]
+	if className == "" {
+		className = req.ClassID
+	}
+
+	// Upsert mapping for faculty + class (a faculty member has one mapping per class)
+	var mapping models.OtpMapping
+	err := cc.DB.Where("faculty_email = ? AND class_id = ?", req.FacultyEmail, req.ClassID).First(&mapping).Error
+	if err == nil {
+		// Update existing mapping venue
+		mapping.VenueID = req.VenueID
+		mapping.VenueName = venue.Name
+		if err := cc.DB.Save(&mapping).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update mapping details"})
+			return
+		}
+		// Clear existing student relationships
+		cc.DB.Where("mapping_id = ?", mapping.ID).Delete(&models.OtpMappingStudent{})
+	} else {
+		// Create new mapping
+		mapping = models.OtpMapping{
+			FacultyEmail: req.FacultyEmail,
+			FacultyName:  faculty.Name,
+			ClassID:      req.ClassID,
+			ClassName:    className,
+			VenueID:      req.VenueID,
+			VenueName:    venue.Name,
+		}
+		if err := cc.DB.Create(&mapping).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create mapping record"})
+			return
+		}
+	}
+
+	// Create new student entries
+	for _, email := range req.StudentEmails {
+		var student models.User
+		if err := cc.DB.Where("emailid = ? AND role = ?", email, "student").First(&student).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Student with email " + email + " not found"})
+			return
+		}
+		studMapping := models.OtpMappingStudent{
+			MappingID:    mapping.ID,
+			StudentEmail: student.EmailID,
+			StudentName:  student.Name,
+		}
+		if err := cc.DB.Create(&studMapping).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create student mapping for " + email})
+			return
+		}
+	}
+
+	// Preload and return
+	cc.DB.Preload("Students").First(&mapping, mapping.ID)
+
+	// Log activity
+	adminEmail, _ := c.Get("emailid")
+	adminRole, _ := c.Get("role")
+	database.LogActivity(
+		adminEmail.(string),
+		adminRole.(string),
+		"OTP Mapping Configured",
+		"Mapped faculty "+mapping.FacultyEmail+" to class "+mapping.ClassID+" in venue "+mapping.VenueName+" with "+fmt.Sprintf("%d", len(mapping.Students))+" students",
+		c.ClientIP(),
+	)
+
+	c.JSON(http.StatusCreated, mapping)
+}
+
+// DeleteOtpMapping removes a mapped student permission
+func (cc *ConfigController) DeleteOtpMapping(c *gin.Context) {
+	id := c.Param("id")
+	cc.DB.Where("mapping_id = ?", id).Delete(&models.OtpMappingStudent{})
+	if err := cc.DB.Delete(&models.OtpMapping{}, id).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete mapping"})
+		return
+	}
+
+	// Log activity
+	adminEmail, _ := c.Get("emailid")
+	adminRole, _ := c.Get("role")
+	database.LogActivity(
+		adminEmail.(string),
+		adminRole.(string),
+		"OTP Mapping Deleted",
+		"Deleted student OTP mapping ID "+id,
+		c.ClientIP(),
+	)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Mapping deleted successfully"})
+}

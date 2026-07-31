@@ -15,6 +15,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     if (path.includes('/admin/venues')) return 'venues';
     if (path.includes('/admin/working-days')) return 'working-days';
     if (path.includes('/admin/session-details')) return 'session-details';
+    if (path.includes('/admin/otp-mapping')) return 'otp-mapping';
     if (path.includes('/admin/audit-logs')) return 'audit';
     if (path.includes('/faculty/otp')) return 'otp';
     if (path.includes('/faculty/timetable')) return 'timetable';
@@ -31,6 +32,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     admin: [
       { id: 'venues', path: '/admin/venues', label: 'Venue Management', icon: MapPin },
       { id: 'working-days', path: '/admin/working-days', label: 'Working Day Mapping', icon: Calendar },
+      { id: 'otp-mapping', path: '/admin/otp-mapping', label: 'OTP Mapping', icon: Layers },
       { id: 'session-details', path: '/admin/session-details', label: 'Session Details', icon: Clock },
       { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', icon: Layers },
       { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },

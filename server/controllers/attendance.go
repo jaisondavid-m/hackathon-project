@@ -76,17 +76,28 @@ func (ac *AttendanceController) StartAttendanceSession(c *gin.Context) {
 		return
 	}
 
-	// Verify venue exists
-	var venue models.Venue
-	if err := ac.DB.First(&venue, req.VenueID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Selected venue does not exist"})
+	facultyEmailVal, exists := c.Get("emailid")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Faculty email not found in context"})
+		return
+	}
+	facultyEmail := facultyEmailVal.(string)
+
+	// Fetch faculty mapping configuration
+	var mapping models.OtpMapping
+	if err := ac.DB.Where("faculty_email = ?", facultyEmail).First(&mapping).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You are not mapped to any class/venue by the Admin. Cannot start session."})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error checking faculty mapping"})
+		}
 		return
 	}
 
 	// Deactivate any previous active sessions for this class and hour on the current date
 	todayStr := time.Now().Format("2006-01-02")
 	ac.DB.Model(&models.AttendanceSession{}).
-		Where("class_id = ? AND hour_number = ? AND date = ? AND is_active = ?", req.ClassID, req.HourNumber, todayStr, true).
+		Where("class_id = ? AND hour_number = ? AND date = ? AND is_active = ?", mapping.ClassID, req.HourNumber, todayStr, true).
 		Update("is_active", false)
 
 	// Create new session
@@ -95,9 +106,9 @@ func (ac *AttendanceController) StartAttendanceSession(c *gin.Context) {
 
 	session := models.AttendanceSession{
 		FacultyID:  facultyID,
-		ClassID:    req.ClassID,
+		ClassID:    mapping.ClassID,
 		HourNumber: req.HourNumber,
-		VenueID:    req.VenueID,
+		VenueID:    mapping.VenueID,
 		OTP:        otp,
 		Date:       todayStr,
 		ExpiresAt:  expiresAt,
@@ -110,13 +121,12 @@ func (ac *AttendanceController) StartAttendanceSession(c *gin.Context) {
 	}
 
 	// Log session start
-	facultyEmail, _ := c.Get("emailid")
 	facultyRole, _ := c.Get("role")
 	database.LogActivity(
-		facultyEmail.(string),
+		facultyEmail,
 		facultyRole.(string),
 		"OTP Session Created",
-		"Generated OTP "+session.OTP+" for class "+session.ClassID+" - Hour "+fmt.Sprintf("%d", session.HourNumber)+" at venue "+venue.Name,
+		"Generated OTP "+session.OTP+" for class "+session.ClassID+" - Hour "+fmt.Sprintf("%d", session.HourNumber)+" at venue "+mapping.VenueName,
 		c.ClientIP(),
 	)
 
@@ -176,6 +186,20 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 		return
 	}
 
+	// Find student's class permission mapping configured by Admin
+	var mappedStudent models.OtpMappingStudent
+	err = ac.DB.Joins("JOIN otp_mappings ON otp_mappings.id = otp_mapping_students.mapping_id").
+		Where("otp_mapping_students.student_email = ? AND otp_mappings.class_id = ?", student.EmailID, session.ClassID).
+		First(&mappedStudent).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You are not mapped to this class. Attendance denied."})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error checking student mapping"})
+		}
+		return
+	}
+
 	// Geolocation Bounding Check
 	if req.Latitude == 0.0 && req.Longitude == 0.0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Geolocation coordinates are required to mark attendance. Please enable location services."})
@@ -184,12 +208,12 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 
 	var venue models.Venue
 	if err := ac.DB.First(&venue, session.VenueID).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve session venue configuration"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve mapped venue configuration"})
 		return
 	}
 
 	if !isPointInQuadrilateral(req.Latitude, req.Longitude, venue) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You are outside the venue boundaries. Attendance denied."})
+		c.JSON(http.StatusForbidden, gin.H{"error": "You are outside the mapped venue boundaries. Attendance denied."})
 		return
 	}
 
@@ -268,19 +292,17 @@ func (ac *AttendanceController) GetStudentRecords(c *gin.Context) {
 	})
 }
 
-// GetClassAttendanceLogs fetches all attendance records logged for a specific session (Faculty only)
 func (ac *AttendanceController) GetClassAttendanceLogs(c *gin.Context) {
-	classID := c.Query("class_id")
 	hourStr := c.Query("hour_number")
 	dateStr := c.Query("date")
 
-	if classID == "" || hourStr == "" || dateStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "class_id, hour_number, and date query parameters are required"})
+	if hourStr == "" || dateStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "hour_number and date query parameters are required"})
 		return
 	}
 
 	var records []models.AttendanceRecord
-	err := ac.DB.Where("class_id = ? AND hour_number = ? AND date = ?", classID, hourStr, dateStr).Find(&records).Error
+	err := ac.DB.Where("hour_number = ? AND date = ?", hourStr, dateStr).Find(&records).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query records"})
 		return

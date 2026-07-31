@@ -7,6 +7,7 @@ import Login from '../pages/common/Login';
 import UserManagement from '../pages/admin/UserManagement';
 import VenueManagement from '../pages/admin/VenueManagement';
 import WorkingDayMapping from '../pages/admin/WorkingDayMapping';
+import OtpMapping from '../pages/admin/OtpMapping';
 import SessionDetails from '../pages/admin/SessionDetails';
 import AuditLogs from '../pages/admin/AuditLogs';
 import FacultyDashboard from '../pages/faculty/FacultyDashboard';
@@ -43,6 +44,7 @@ function DashboardLayout({ user, onLogout }) {
     if (path.includes('/admin/users')) return 'Users Management';
     if (path.includes('/admin/venues')) return 'Venue Management';
     if (path.includes('/admin/working-days')) return 'Working Day Mapping';
+    if (path.includes('/admin/otp-mapping')) return 'OTP Bounding Mapping';
     if (path.includes('/admin/session-details')) return 'Session Details';
     if (path.includes('/admin/audit-logs')) return 'Audit Logs';
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
@@ -174,6 +176,7 @@ function App() {
             <Route path="users" element={<UserManagement />} />
             <Route path="venues" element={<VenueManagement />} />
             <Route path="working-days" element={<WorkingDayMapping />} />
+            <Route path="otp-mapping" element={<OtpMapping />} />
             <Route path="session-details" element={<SessionDetails />} />
             <Route path="audit-logs" element={<AuditLogs />} />
           </Route>

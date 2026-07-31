@@ -3,36 +3,29 @@ import {
   Key, AlertCircle, Clock, QrCode, UserCheck, RefreshCw 
 } from 'lucide-react';
 import { attendanceService } from '../../api/attendance';
-import { venueService } from '../../api/venue';
 import { configService } from '../../api/config';
 
-import { useOutletContext } from 'react-router-dom';
-
 function OTPGeneration() {
-  const { selectedClass, setSelectedClass, classes } = useOutletContext();
   const [selectedHour, setSelectedHour] = useState(1);
   const [otpError, setOtpError] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [activeSession, setActiveSession] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0); // in seconds
   const [scannedStudents, setScannedStudents] = useState([]);
-  const [venues, setVenues] = useState([]);
-  const [selectedVenue, setSelectedVenue] = useState('');
   const [todayOverride, setTodayOverride] = useState(null);
 
   const timerRef = useRef(null);
   const pollRef = useRef(null);
 
-  // Restore/Fetch active OTP session and Venues list on mount or selectedClass change
+  // Restore/Fetch active OTP session on mount
   useEffect(() => {
     fetchActiveSession();
-    fetchVenues();
     checkTodayStatus();
     return () => {
       stopTimer();
       stopPolling();
     };
-  }, [selectedClass]);
+  }, []);
 
   const checkTodayStatus = async () => {
     try {
@@ -55,25 +48,11 @@ function OTPGeneration() {
     }
   };
 
-  const fetchVenues = async () => {
-    try {
-      const vData = await venueService.getVenues();
-      setVenues(vData);
-      if (vData.length > 0) {
-        setSelectedVenue(vData[0].id);
-      }
-    } catch (err) {
-      console.error('Failed to load class venues:', err);
-    }
-  };
-
   const fetchActiveSession = async () => {
     try {
       const activeSessions = await attendanceService.getActiveSessions();
-      // Find session for currently selected class
-      const currentClassSession = activeSessions.find(s => s.class_id === selectedClass);
-      if (currentClassSession) {
-        startTimerAndPolling(currentClassSession);
+      if (activeSessions && activeSessions.length > 0) {
+        startTimerAndPolling(activeSessions[0]);
       } else {
         stopTimer();
         stopPolling();
@@ -118,7 +97,7 @@ function OTPGeneration() {
   const fetchClassLogs = async (session) => {
     try {
       const logs = await attendanceService.getClassLogs(
-        session.class_id,
+        '', // class_id is empty/GENERAL
         session.hour_number,
         session.date
       );
@@ -136,16 +115,12 @@ function OTPGeneration() {
     if (pollRef.current) clearInterval(pollRef.current);
   };
 
-  // Generate OTP Session
+  // Generate OTP Session (Faculty only selects Hour/Period)
   const handleGenerateOTP = async () => {
-    if (!selectedVenue) {
-      setOtpError('Please select a venue before generating a session.');
-      return;
-    }
     setOtpError('');
     setOtpLoading(true);
     try {
-      const session = await attendanceService.startSession(selectedClass, selectedHour, selectedVenue);
+      const session = await attendanceService.startSession('', selectedHour, 0);
       startTimerAndPolling(session);
     } catch (err) {
       console.error(err);
@@ -162,8 +137,6 @@ function OTPGeneration() {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  const currentClassName = classes.find(c => c.id === selectedClass)?.name || '';
-
   return (
     <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md p-6 sm:p-8 animate-fadeIn">
       {!activeSession ? (
@@ -176,7 +149,7 @@ function OTPGeneration() {
             <div>
               <h3 className="font-bold text-lg text-slate-800">Generate Session Code</h3>
               <p className="text-xs text-slate-400 font-semibold tracking-wider uppercase mt-0.5">
-                Selected: {currentClassName}
+                Generate OTP and QR Code for class checking
               </p>
             </div>
           </div>
@@ -189,46 +162,6 @@ function OTPGeneration() {
           )}
 
           <div className="space-y-4">
-            {/* Class / Course Selector */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Select Active Class / Course
-              </label>
-              <select
-                value={selectedClass}
-                onChange={(e) => setSelectedClass(e.target.value)}
-                className="w-full px-3.5 py-2 border border-slate-200 bg-white text-slate-800 text-sm font-semibold rounded-xl focus:outline-none focus:border-[#7D53F6] focus:ring-2 focus:ring-[#7D53F6]/20 transition-all cursor-pointer"
-              >
-                {classes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({c.id})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Venue Selector */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Select Class Venue (Geofenced Bounding Box)
-              </label>
-              <select
-                value={selectedVenue}
-                onChange={(e) => setSelectedVenue(e.target.value)}
-                className="w-full px-3.5 py-2 border border-slate-200 bg-white text-slate-800 text-sm font-semibold rounded-xl focus:outline-none focus:border-[#7D53F6] focus:ring-2 focus:ring-[#7D53F6]/20 transition-all cursor-pointer"
-              >
-                {venues.length > 0 ? (
-                  venues.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">No Geofenced Venues Defined</option>
-                )}
-              </select>
-            </div>
-
             {/* Holiday or Half Day warnings */}
             {todayOverride && todayOverride.is_holiday && (
               <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-start gap-3 text-rose-700 text-xs font-semibold">
@@ -309,7 +242,7 @@ function OTPGeneration() {
             </div>
 
             <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest block mb-1">
-              {currentClassName} &bull; Hour {activeSession.hour_number}
+              Active Session &bull; Hour {activeSession.hour_number}
             </span>
 
             {/* Glowing OTP */}
