@@ -5,11 +5,13 @@ export const attendanceService = {
    * Starts a new OTP attendance session (Faculty only)
    * @param {string} classId
    * @param {number} hourNumber
+   * @param {number} venueId
    */
-  async startSession(classId, hourNumber) {
+  async startSession(classId, hourNumber, venueId) {
     const response = await api.post('/faculty/sessions', {
       class_id: classId,
-      hour_number: Number(hourNumber)
+      hour_number: Number(hourNumber),
+      venue_id: Number(venueId)
     });
     return response.data;
   },
@@ -39,9 +41,15 @@ export const attendanceService = {
   /**
    * Student submits an OTP to register presence (Student only)
    * @param {string} otp 6-digit OTP code
+   * @param {number} latitude Student latitude
+   * @param {number} longitude Student longitude
    */
-  async submitOTP(otp) {
-    const response = await api.post('/student/attendance/submit', { otp });
+  async submitOTP(otp, latitude, longitude) {
+    const response = await api.post('/student/attendance/submit', {
+      otp,
+      latitude: Number(latitude),
+      longitude: Number(longitude)
+    });
     return response.data;
   },
 

@@ -4,6 +4,7 @@ import {
   AlertCircle, Key, QrCode, Clock, RefreshCw, Layers
 } from 'lucide-react';
 import { attendanceService } from '../api/attendance';
+import { venueService } from '../api/venue';
 
 function FacultyDashboard() {
   const [activeTab, setActiveTab] = useState('otp'); // 'otp' or 'manual'
@@ -19,6 +20,10 @@ function FacultyDashboard() {
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
   
+  // Venue States
+  const [venues, setVenues] = useState([]);
+  const [selectedVenue, setSelectedVenue] = useState('');
+
   const timerRef = useRef(null);
   const pollRef = useRef(null);
 
@@ -54,14 +59,27 @@ function FacultyDashboard() {
 
   const [students, setStudents] = useState(initialStudents);
 
-  // Restore/Fetch active OTP session on mount/class change
+  // Restore/Fetch active OTP session and Venues list on mount/class change
   useEffect(() => {
     fetchActiveSession();
+    fetchVenues();
     return () => {
       stopTimer();
       stopPolling();
     };
   }, [selectedClass]);
+
+  const fetchVenues = async () => {
+    try {
+      const vData = await venueService.getVenues();
+      setVenues(vData);
+      if (vData.length > 0) {
+        setSelectedVenue(vData[0].id);
+      }
+    } catch (err) {
+      console.error('Failed to load class venues:', err);
+    }
+  };
 
   const fetchActiveSession = async () => {
     try {
@@ -134,10 +152,14 @@ function FacultyDashboard() {
 
   // Generate OTP Session
   const handleGenerateOTP = async () => {
+    if (!selectedVenue) {
+      setOtpError('Please select a venue before generating a session.');
+      return;
+    }
     setOtpError('');
     setOtpLoading(true);
     try {
-      const session = await attendanceService.startSession(selectedClass, selectedHour);
+      const session = await attendanceService.startSession(selectedClass, selectedHour, selectedVenue);
       startTimerAndPolling(session);
     } catch (err) {
       console.error(err);
@@ -305,6 +327,28 @@ function FacultyDashboard() {
                   )}
 
                   <div className="space-y-4">
+                    {/* Venue Selector */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        Select Class Venue (Geofenced Bounding Box)
+                      </label>
+                      <select
+                        value={selectedVenue}
+                        onChange={(e) => setSelectedVenue(e.target.value)}
+                        className="w-full px-3.5 py-2 border border-slate-200 bg-white text-slate-855 text-sm font-semibold rounded-xl focus:outline-none focus:border-[#7D53F6] focus:ring-2 focus:ring-[#7D53F6]/20 transition-all cursor-pointer"
+                      >
+                        {venues.length > 0 ? (
+                          venues.map((v) => (
+                            <option key={v.id} value={v.id}>
+                              {v.name}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="">No Geofenced Venues Defined</option>
+                        )}
+                      </select>
+                    </div>
+
                     {/* Hour Number Selector */}
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-2">

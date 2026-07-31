@@ -29,6 +29,7 @@ func main() {
 	authController := controllers.NewAuthController(db, cfg)
 	configController := controllers.NewConfigController(db)
 	attendanceController := controllers.NewAttendanceController(db)
+	venueController := controllers.NewVenueController(db)
 
 	// Set up router
 	r := gin.Default()
@@ -58,6 +59,7 @@ func main() {
 		protected.GET("/profile", authController.GetProfile)
 		protected.GET("/hours", configController.GetHourConfigs)
 		protected.GET("/holidays", configController.GetHolidays)
+		protected.GET("/venues", venueController.GetVenues)
 
 		// Faculty & Admin Routes
 		facultyOnly := protected.Group("/")
@@ -83,6 +85,7 @@ func main() {
 			adminOnly.POST("/users", authController.CreateUser)
 			adminOnly.POST("/hours", configController.SaveHourConfigs)
 			adminOnly.POST("/holidays", configController.SaveHoliday)
+			adminOnly.POST("/venues", venueController.CreateVenue)
 		}
 	}
 

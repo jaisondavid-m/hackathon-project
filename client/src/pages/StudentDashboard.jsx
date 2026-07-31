@@ -42,21 +42,38 @@ function StudentDashboard({ user }) {
       return;
     }
 
-    setSubmitLoading(true);
-    try {
-      const record = await attendanceService.submitOTP(otp);
-      setSubmitSuccess(`Attendance marked for ${record.class_id} - Hour ${record.hour_number}!`);
-      setOtp('');
-      
-      // Re-fetch attendance to update statistics and lists
-      await fetchStudentAttendance();
-    } catch (err) {
-      console.error(err);
-      const errMsg = err.response?.data?.error || 'Failed to submit OTP. Code may be invalid or expired.';
-      setSubmitError(errMsg);
-    } finally {
-      setSubmitLoading(false);
+    if (!navigator.geolocation) {
+      setSubmitError('Geolocation is not supported by your browser. Geofence verification failed.');
+      return;
     }
+
+    setSubmitLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const record = await attendanceService.submitOTP(otp, latitude, longitude);
+          setSubmitSuccess(`Attendance marked for ${record.class_id} - Hour ${record.hour_number}!`);
+          setOtp('');
+          
+          // Re-fetch attendance to update statistics and lists
+          await fetchStudentAttendance();
+        } catch (err) {
+          console.error(err);
+          const errMsg = err.response?.data?.error || 'Failed to submit OTP. Code may be invalid or expired.';
+          setSubmitError(errMsg);
+        } finally {
+          setSubmitLoading(false);
+        }
+      },
+      (error) => {
+        console.error(error);
+        setSubmitError(`Location access is required to mark attendance: ${error.message}`);
+        setSubmitLoading(false);
+      },
+      { enableHighAccuracy: true, maximumAge: 0 }
+    );
   };
 
   // Denominator (total classes scheduled in the semester)
@@ -239,6 +256,10 @@ function StudentDashboard({ user }) {
                 )}
               </button>
             </form>
+            <div className="mt-3.5 flex items-start gap-1.5 text-[10px] text-slate-400 font-semibold leading-normal">
+              <span className="text-[#7D53F6] flex-shrink-0">⚠️</span>
+              <span>GPS permission will be requested to verify you are inside the designated venue boundaries.</span>
+            </div>
           </div>
         </div>
       </div>

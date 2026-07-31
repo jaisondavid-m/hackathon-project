@@ -48,7 +48,7 @@ func InitDB(dsn string) (*gorm.DB, error) {
 	log.Println("Database connection established successfully")
 
 	// Run migrations
-	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{}, &models.AttendanceSession{}, &models.AttendanceRecord{})
+	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{}, &models.AttendanceSession{}, &models.AttendanceRecord{}, &models.Venue{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to auto-migrate database: %w", err)
 	}
@@ -124,6 +124,29 @@ func SeedData() error {
 		for _, h := range defaultHours {
 			if err := DB.Create(&h).Error; err != nil {
 				log.Printf("Warning: failed to seed hour %d: %v\n", h.HourNumber, err)
+			}
+		}
+	}
+
+	// Seed Venues Configurations
+	var venueCount int64
+	if err := DB.Model(&models.Venue{}).Count(&venueCount).Error; err == nil && venueCount == 0 {
+		defaultVenues := []models.Venue{
+			{
+				Name: "BITS Campus (Global Test Area)",
+				// A broad bounding box covering the entire world coordinates
+				// so that testing is simple, but custom venues can be added
+				Lat1: 90.0, Lon1: -180.0,
+				Lat2: 90.0, Lon2: 180.0,
+				Lat3: -90.0, Lon3: 180.0,
+				Lat4: -90.0, Lon4: -180.0,
+			},
+		}
+
+		log.Println("Seeding default Venues...")
+		for _, v := range defaultVenues {
+			if err := DB.Create(&v).Error; err != nil {
+				log.Printf("Warning: failed to seed venue %s: %v\n", v.Name, err)
 			}
 		}
 	}

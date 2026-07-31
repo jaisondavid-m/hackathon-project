@@ -11,6 +11,7 @@ type AttendanceSession struct {
 	FacultyID  uint           `gorm:"not null" json:"faculty_id"`
 	ClassID    string         `gorm:"size:255;not null" json:"class_id"`
 	HourNumber int            `gorm:"not null" json:"hour_number"`
+	VenueID    uint           `gorm:"not null" json:"venue_id"`
 	OTP        string         `gorm:"size:6;not null" json:"otp"`
 	Date       string         `gorm:"size:20;not null" json:"date"` // Format: YYYY-MM-DD
 	ExpiresAt  time.Time      `gorm:"not null" json:"expires_at"`
@@ -36,8 +37,11 @@ type AttendanceRecord struct {
 type CreateSessionRequest struct {
 	ClassID    string `json:"class_id" binding:"required"`
 	HourNumber int    `json:"hour_number" binding:"required,min=1,max=7"`
+	VenueID    uint   `json:"venue_id" binding:"required"`
 }
 
 type SubmitOTPRequest struct {
-	OTP string `json:"otp" binding:"required,len=6"`
+	OTP       string  `json:"otp" binding:"required,len=6"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }

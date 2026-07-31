@@ -34,7 +34,32 @@ func generateOTP() string {
 	return string(b)
 }
 
-// StartAttendanceSession initiates a new OTP session (Faculty only)
+type Point struct {
+	Lat float64
+	Lon float64
+}
+
+// Ray-casting algorithm to verify if student coordinates are inside the venue box
+func isPointInQuadrilateral(lat, lon float64, v models.Venue) bool {
+	vertices := []Point{
+		{v.Lat1, v.Lon1},
+		{v.Lat2, v.Lon2},
+		{v.Lat3, v.Lon3},
+		{v.Lat4, v.Lon4},
+	}
+	inside := false
+	j := len(vertices) - 1
+	for i := 0; i < len(vertices); i++ {
+		if (vertices[i].Lon > lon) != (vertices[j].Lon > lon) &&
+			lat < (vertices[j].Lat-vertices[i].Lat)*(lon-vertices[i].Lon)/(vertices[j].Lon-vertices[i].Lon)+vertices[i].Lat {
+			inside = !inside
+		}
+		j = i
+	}
+	return inside
+}
+
+// StartAttendanceSession initiates a new OTP session linked to a venue (Faculty only)
 func (ac *AttendanceController) StartAttendanceSession(c *gin.Context) {
 	facultyIDVal, exists := c.Get("userID")
 	if !exists {
@@ -46,6 +71,13 @@ func (ac *AttendanceController) StartAttendanceSession(c *gin.Context) {
 	var req models.CreateSessionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Verify venue exists
+	var venue models.Venue
+	if err := ac.DB.First(&venue, req.VenueID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Selected venue does not exist"})
 		return
 	}
 
@@ -63,6 +95,7 @@ func (ac *AttendanceController) StartAttendanceSession(c *gin.Context) {
 		FacultyID:  facultyID,
 		ClassID:    req.ClassID,
 		HourNumber: req.HourNumber,
+		VenueID:    req.VenueID,
 		OTP:        otp,
 		Date:       todayStr,
 		ExpiresAt:  expiresAt,
@@ -96,7 +129,7 @@ func (ac *AttendanceController) GetActiveSessions(c *gin.Context) {
 	c.JSON(http.StatusOK, sessions)
 }
 
-// SubmitOTP marks student attendance using the OTP code (Student only)
+// SubmitOTP marks student attendance using OTP and verifies geofencing (Student only)
 func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 	studentIDVal, exists := c.Get("userID")
 	if !exists {
@@ -130,6 +163,23 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 		return
 	}
 
+	// Geolocation Bounding Check
+	if req.Latitude == 0.0 && req.Longitude == 0.0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geolocation coordinates are required to mark attendance. Please enable location services."})
+		return
+	}
+
+	var venue models.Venue
+	if err := ac.DB.First(&venue, session.VenueID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve session venue configuration"})
+		return
+	}
+
+	if !isPointInQuadrilateral(req.Latitude, req.Longitude, venue) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You are outside the venue boundaries. Attendance denied."})
+		return
+	}
+
 	// Check if attendance is already logged for this session
 	var existingRecord models.AttendanceRecord
 	err = ac.DB.Where("student_id = ? AND class_id = ? AND hour_number = ? AND date = ?", studentID, session.ClassID, session.HourNumber, session.Date).First(&existingRecord).Error
@@ -156,7 +206,6 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 		return
 	}
 
-	// Optionally close the session for this student (they got in). Keep it open for others.
 	c.JSON(http.StatusOK, record)
 }
 
