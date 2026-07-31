@@ -29,16 +29,16 @@ func InitDB(dsn string) (*gorm.DB, error) {
 	}
 	log.Println("Database auto-migration completed")
 
-	// Seed default admin if table is empty
-	err = SeedAdmin()
+	// Seed test accounts if table is empty
+	err = SeedData()
 	if err != nil {
-		log.Printf("Warning: Seeding admin failed: %v\n", err)
+		log.Printf("Warning: Seeding test data failed: %v\n", err)
 	}
 
 	return DB, nil
 }
 
-func SeedAdmin() error {
+func SeedData() error {
 	var count int64
 	// Check if any user exists
 	if err := DB.Model(&models.User{}).Count(&count).Error; err != nil {
@@ -46,39 +46,39 @@ func SeedAdmin() error {
 	}
 
 	if count == 0 {
-		defaultEmail := "admin@example.com"
-		defaultPassword := "admin123"
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(defaultPassword), bcrypt.DefaultCost)
-		if err != nil {
-			return fmt.Errorf("failed to hash default admin password: %w", err)
-		}
-
-		admin := models.User{
-			Name:     "Admin User",
-			EmailID:  defaultEmail,
-			Password: string(hashedPassword),
-			Role:     models.RoleAdmin,
-		}
-
-		if err := DB.Create(&admin).Error; err != nil {
-			return fmt.Errorf("failed to create default admin: %w", err)
+		usersToSeed := []struct {
+			name     string
+			email    string
+			password string
+			role     string
+		}{
+			{"System Admin", "admin@bitsathy.ac.in", "admin123", models.RoleAdmin},
+			{"Jaison David", "jaisondavidm.cs25@bitsathy.ac.in", "jaison123", models.RoleStudent},
+			{"Faculty Member", "faculty@bitsathy.ac.in", "faculty", models.RoleFaculty},
 		}
 
 		log.Println("----------------------------------------------------------------------")
-		log.Println("NO USERS FOUND. Seeded default admin:")
-		log.Printf("EmailID:  %s\n", defaultEmail)
-		log.Printf("Password: %s\n", defaultPassword)
-		log.Println("----------------------------------------------------------------------")
-		log.Println("To manually insert an admin user directly into your database, run:")
-		log.Printf("INSERT INTO users (name, emailid, password, role, created_at, updated_at) VALUES ('Admin User', '%s', '%s', 'admin', NOW(), NOW());\n", defaultEmail, string(hashedPassword))
-		log.Println("----------------------------------------------------------------------")
-	} else {
-		// Log the manual SQL example anyway for the user's reference
-		tempHash, _ := bcrypt.GenerateFromPassword([]byte("yourpassword"), bcrypt.DefaultCost)
-		log.Println("----------------------------------------------------------------------")
-		log.Println("MANUAL DATABASE INSERT REFERENCE:")
-		log.Println("If you want to manually insert an admin into the database using SQL:")
-		log.Printf("INSERT INTO users (name, emailid, password, role, created_at, updated_at) VALUES ('Admin Name', 'admin@example.com', '%s', 'admin', NOW(), NOW());\n", string(tempHash))
+		log.Println("NO USERS FOUND. Seeding test accounts:")
+
+		for _, u := range usersToSeed {
+			hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.password), bcrypt.DefaultCost)
+			if err != nil {
+				return fmt.Errorf("failed to hash password for %s: %w", u.email, err)
+			}
+
+			user := models.User{
+				Name:     u.name,
+				EmailID:  u.email,
+				Password: string(hashedPassword),
+				Role:     u.role,
+			}
+
+			if err := DB.Create(&user).Error; err != nil {
+				return fmt.Errorf("failed to create user %s: %w", u.email, err)
+			}
+
+			log.Printf("Seeded: %s | EmailID: %s | Password: %s | Role: %s\n", u.name, u.email, u.password, u.role)
+		}
 		log.Println("----------------------------------------------------------------------")
 	}
 

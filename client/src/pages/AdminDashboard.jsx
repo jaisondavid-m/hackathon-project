@@ -140,7 +140,7 @@ function AdminDashboard() {
                 name="emailid"
                 value={formData.emailid}
                 onChange={handleChange}
-                placeholder="e.g. john@university.edu"
+                placeholder="e.g. john@bitsathy.ac.in"
                 icon={Mail}
                 required
                 disabled={loading}

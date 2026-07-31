@@ -38,6 +38,22 @@ function Login({ onLoginSuccess }) {
     }
   };
 
+  const handleQuickLogin = async (email, password) => {
+    setError('');
+    setLoading(true);
+    try {
+      const user = await authService.login(email, password);
+      onLoginSuccess(user);
+    } catch (err) {
+      console.error('Quick login error:', err);
+      const errMsg =
+        err.response?.data?.error || 'Quick login failed. Connection issue.';
+      setError(errMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#EEF1F9] flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background graphic elements */}
@@ -110,6 +126,31 @@ function Login({ onLoginSuccess }) {
                 </>
               )}
             </button>
+
+            {/* Quick Auto Login Row */}
+            <div className="mt-4 pt-4 border-t border-slate-100/80">
+              <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest text-center mb-2">
+                Quick Testing Auto-Login
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { role: 'Admin', email: 'admin@bitsathy.ac.in', pwd: 'admin123', color: 'hover:border-amber-400 hover:text-amber-600' },
+                  { role: 'Faculty', email: 'faculty@bitsathy.ac.in', pwd: 'faculty', color: 'hover:border-[#7D53F6] hover:text-[#7D53F6]' },
+                  { role: 'Student', email: 'jaisondavidm.cs25@bitsathy.ac.in', pwd: 'jaison123', color: 'hover:border-emerald-500 hover:text-emerald-600' }
+                ].map((item) => (
+                  <button
+                    key={item.role}
+                    type="button"
+                    disabled={loading}
+                    onClick={() => handleQuickLogin(item.email, item.pwd)}
+                    className="py-2 px-1 border border-slate-100 bg-slate-50/50 rounded-xl transition-all duration-150 cursor-pointer text-center hover:bg-white hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95"
+                  >
+                    <span className="font-extrabold text-[10px] block leading-none">{item.role}</span>
+                    <span className="text-[8px] text-slate-400 font-semibold block truncate px-1 mt-1 leading-none">{item.email}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </form>
 
           {/* Access Policy Info */}
