@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, LogIn, AlertCircle, Shield, User, Eye, EyeOff } from 'lucide-react';
-import { authService } from '../api/auth';
+import { authService } from '../../api/auth';
 
 function Login({ onLoginSuccess }) {
   const [formData, setFormData] = useState({

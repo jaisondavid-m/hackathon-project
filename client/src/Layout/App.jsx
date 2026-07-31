@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, Outlet } from 'react-router-dom';
 import { authService } from '../api/auth';
 import Navbar from '../components/Navbar';
-import Login from '../pages/Login';
-import AdminDashboard from '../pages/AdminDashboard';
-import FacultyDashboard from '../pages/FacultyDashboard';
-import StudentDashboard from '../pages/StudentDashboard';
-import Home from '../pages/Home';
+import Login from '../pages/common/Login';
+import AdminDashboard from '../pages/admin/AdminDashboard';
+import FacultyDashboard from '../pages/faculty/FacultyDashboard';
+import StudentDashboard from '../pages/student/StudentDashboard';
+import Home from '../pages/common/Home';
 
 function ProtectedRoute({ user, allowedRole }) {
   if (!user) {

@@ -1,7 +1,7 @@
 import React from 'react';
-import AdminDashboard from './AdminDashboard';
-import FacultyDashboard from './FacultyDashboard';
-import StudentDashboard from './StudentDashboard';
+import AdminDashboard from '../admin/AdminDashboard';
+import FacultyDashboard from '../faculty/FacultyDashboard';
+import StudentDashboard from '../student/StudentDashboard';
 import { AlertCircle } from 'lucide-react';
 
 function Dashboard({ user }) {
