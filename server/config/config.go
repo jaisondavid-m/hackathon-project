@@ -15,15 +15,15 @@ func LoadConfig() *Config {
 	port := getEnv("PORT", "8080")
 	jwtSecret := getEnv("JWT_SECRET", "supersecretkey")
 
-	dbUser := getEnv("DB_USER", "root")
-	dbPassword := getEnv("DB_PASSWORD", "jaison")
-	dbHost := getEnv("DB_HOST", "127.0.0.1")
-	dbPort := getEnv("DB_PORT", "3306")
-	dbName := getEnv("DB_NAME", "hackathon_db")
+	dbUser := "2y92yVy5xdscPQx.root"
+	dbPassword := "C9c6q1X8VPfdHIod"
+	dbHost := "gateway01.ap-southeast-1.prod.aws.tidbcloud.com"
+	dbPort := "4000"
+	dbName := "test"
 
-	// Create MySQL DSN: username:password@tcp(host:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local
+	// Create MySQL DSN: username:password@tcp(host:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local&tls=tidb
 	// For GORM, we want to allow parseTime=True to map datetime fields to time.Time in Go
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&tls=tidb",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
 
 	return &Config{
