@@ -65,7 +65,7 @@ function Login({ onLoginSuccess }) {
         <div className="bg-white rounded-3xl border border-slate-100/80 shadow-2xl p-6 sm:p-8 transition-all duration-300">
           
           {/* Logo & Branding */}
-          <div className="flex flex-col items-center justify-center text-center gap-2 mb-6">
+          <div className="flex flex-col items-center justify-center text-center gap-2 mb-8">
             <img src="/logo.png" alt="PCDP Logo" className="h-12 w-auto flex-shrink-0" />
             <div className="flex flex-col items-center">
               <div className="text-xl font-extrabold text-[#7D53F6] tracking-tight leading-none">
@@ -75,16 +75,6 @@ function Login({ onLoginSuccess }) {
                 Enterprise Attendance
               </div>
             </div>
-          </div>
-
-          {/* Welcome Titles */}
-          <div className="mb-4 text-center">
-            <h2 className="text-lg font-bold text-slate-800 tracking-tight leading-snug">
-              Welcome back
-            </h2>
-            <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">
-              Please enter your credentials to access the dashboard.
-            </p>
           </div>
 
           {/* Error Alert */}
