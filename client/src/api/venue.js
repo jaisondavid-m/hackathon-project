@@ -20,5 +20,14 @@ export const venueService = {
     const response = await api.post('/admin/venues', venueData);
     venuesCache = null; // Invalidate cache
     return response.data;
+  },
+
+  /**
+   * Updates an existing geofenced venue (Admin only)
+   */
+  async updateVenue(id, venueData) {
+    const response = await api.put(`/admin/venues/${id}`, venueData);
+    venuesCache = null; // Invalidate cache
+    return response.data;
   }
 };

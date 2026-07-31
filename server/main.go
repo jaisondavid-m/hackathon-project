@@ -92,6 +92,7 @@ func main() {
 			adminOnly.POST("/hours", configController.SaveHourConfigs)
 			adminOnly.POST("/holidays", configController.SaveHoliday)
 			adminOnly.POST("/venues", venueController.CreateVenue)
+			adminOnly.PUT("/venues/:id", venueController.UpdateVenue)
 			adminOnly.GET("/audit-logs", auditController.GetAuditLogs)
 		}
 	}

@@ -71,12 +71,6 @@ function DashboardLayout({ user, onLogout }) {
 
         {/* Content View wrap */}
         <div className="flex-grow p-4 sm:p-8 flex flex-col">
-          {/* Breadcrumb Path trail */}
-          <div className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 leading-none select-none">
-            <span>PCDP v4.0</span>
-            <span>&rsaquo;</span>
-            <span className="text-[#7D53F6]">{getTabLabel()}</span>
-          </div>
 
           {/* Wrapper white card container */}
           <main className="bg-white rounded-[32px] border border-slate-100/80 shadow-md p-6 sm:p-8 flex-grow">
