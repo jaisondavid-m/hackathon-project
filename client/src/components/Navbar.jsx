@@ -12,7 +12,9 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path.includes('/admin/users')) return 'Users Management';
-    if (path.includes('/admin/config')) return 'Configuration';
+    if (path.includes('/admin/venues')) return 'Venue Management';
+    if (path.includes('/admin/working-days')) return 'Working Day Mapping';
+    if (path.includes('/admin/session-details')) return 'Session Details';
     if (path.includes('/admin/audit-logs')) return 'Audit Logs';
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
     if (path.includes('/faculty/manual')) return 'Manual Sheet';

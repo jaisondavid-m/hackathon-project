@@ -5,7 +5,9 @@ import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Login from '../pages/common/Login';
 import UserManagement from '../pages/admin/UserManagement';
-import ConfigManagement from '../pages/admin/ConfigManagement';
+import VenueManagement from '../pages/admin/VenueManagement';
+import WorkingDayMapping from '../pages/admin/WorkingDayMapping';
+import SessionDetails from '../pages/admin/SessionDetails';
 import AuditLogs from '../pages/admin/AuditLogs';
 import FacultyDashboard from '../pages/faculty/FacultyDashboard';
 import OTPGeneration from '../pages/faculty/OTPGeneration';
@@ -38,7 +40,9 @@ function DashboardLayout({ user, onLogout }) {
   const getTabLabel = () => {
     const path = location.pathname;
     if (path.includes('/admin/users')) return 'Users Management';
-    if (path.includes('/admin/config')) return 'Configuration';
+    if (path.includes('/admin/venues')) return 'Venue Management';
+    if (path.includes('/admin/working-days')) return 'Working Day Mapping';
+    if (path.includes('/admin/session-details')) return 'Session Details';
     if (path.includes('/admin/audit-logs')) return 'Audit Logs';
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
     if (path.includes('/faculty/manual')) return 'Manual Sheet';
@@ -172,7 +176,9 @@ function App() {
           <Route path="/admin">
             <Route index element={<Navigate to="users" replace />} />
             <Route path="users" element={<UserManagement />} />
-            <Route path="config" element={<ConfigManagement />} />
+            <Route path="venues" element={<VenueManagement />} />
+            <Route path="working-days" element={<WorkingDayMapping />} />
+            <Route path="session-details" element={<SessionDetails />} />
             <Route path="audit-logs" element={<AuditLogs />} />
           </Route>
         </Route>

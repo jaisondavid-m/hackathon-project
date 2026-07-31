@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Users, Settings, Layers, Key, X } from 'lucide-react';
+import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock } from 'lucide-react';
 
 function Sidebar({ user, mobileOpen, onCloseMobile }) {
   const location = useLocation();
@@ -12,7 +12,9 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
   const getActiveItem = () => {
     const path = location.pathname;
     if (path.includes('/admin/users')) return 'users';
-    if (path.includes('/admin/config')) return 'config';
+    if (path.includes('/admin/venues')) return 'venues';
+    if (path.includes('/admin/working-days')) return 'working-days';
+    if (path.includes('/admin/session-details')) return 'session-details';
     if (path.includes('/admin/audit-logs')) return 'audit';
     if (path.includes('/faculty/otp')) return 'otp';
     if (path.includes('/faculty/manual')) return 'manual';
@@ -27,7 +29,9 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
   const menuItems = {
     admin: [
       { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
-      { id: 'config', path: '/admin/config', label: 'Configuration', icon: Settings },
+      { id: 'venues', path: '/admin/venues', label: 'Venue Management', icon: MapPin },
+      { id: 'working-days', path: '/admin/working-days', label: 'Working Day Mapping', icon: Calendar },
+      { id: 'session-details', path: '/admin/session-details', label: 'Session Details', icon: Clock },
       { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', icon: Layers },
     ],
     faculty: [
