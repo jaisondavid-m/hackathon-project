@@ -1,11 +1,15 @@
 package database
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"log"
+	"os"
 
 	"server/models"
 
+	mysqlDriver "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -14,7 +18,28 @@ import (
 var DB *gorm.DB
 
 func InitDB(dsn string) (*gorm.DB, error) {
-	var err error
+	// Register TiDB custom TLS configuration
+	rootCertPool := x509.NewCertPool()
+	pem, err := os.ReadFile("cert/isrgrootx1.pem")
+	if err != nil {
+		// Fallback to server/cert/isrgrootx1.pem if started from workspace root
+		pem, err = os.ReadFile("server/cert/isrgrootx1.pem")
+		if err != nil {
+			return nil, fmt.Errorf("failed to read cert file: %w", err)
+		}
+	}
+	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+		return nil, fmt.Errorf("failed to append PEM certificate to pool")
+	}
+
+	err = mysqlDriver.RegisterTLSConfig("tidb", &tls.Config{
+		RootCAs:    rootCertPool,
+		ServerName: "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to register custom TLS config: %w", err)
+	}
+
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
