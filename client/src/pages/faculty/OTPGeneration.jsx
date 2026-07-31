@@ -5,7 +5,10 @@ import {
 import { attendanceService } from '../../api/attendance';
 import { venueService } from '../../api/venue';
 
-function OTPGeneration({ selectedClass, classes }) {
+import { useOutletContext } from 'react-router-dom';
+
+function OTPGeneration() {
+  const { selectedClass, classes } = useOutletContext();
   const [selectedHour, setSelectedHour] = useState(1);
   const [otpError, setOtpError] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);

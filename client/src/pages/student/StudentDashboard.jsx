@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { Key, Layers } from 'lucide-react';
 import { attendanceService } from '../../api/attendance';
-import StudentStats from './StudentStats';
-import OTPAttendance from './OTPAttendance';
-import SubjectBreakdown from './SubjectBreakdown';
-import HistoryLogs from './HistoryLogs';
 
 function StudentDashboard({ user }) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [records, setRecords] = useState([]);
   const [stats, setStats] = useState({ total: 0, present: 0, late: 0 });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchStudentAttendance();
@@ -23,11 +22,18 @@ function StudentDashboard({ user }) {
       setStats(data.stats || { total: 0, present: 0, late: 0 });
     } catch (err) {
       console.error(err);
-      setError('Failed to load attendance history.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Determine active tab based on current path
+  const getActiveTab = () => {
+    if (location.pathname.includes('/student/history')) return 'history';
+    return 'otp';
+  };
+
+  const activeTab = getActiveTab();
 
   if (loading && records.length === 0) {
     return (
@@ -42,37 +48,43 @@ function StudentDashboard({ user }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Student Dashboard</h1>
-        <p className="text-slate-500 text-sm sm:text-base mt-1.5 font-medium">
-          Welcome back, {user?.name || 'Student'}! Enter active OTP codes to log attendance.
-        </p>
+      {/* Header with Switcher Tabs */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-4 border-b border-slate-100">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Student Dashboard</h1>
+          <p className="text-slate-500 text-sm mt-1 font-medium">
+            Welcome back, {user?.name || 'Student'}! Enter active OTP codes or view your attendance history.
+          </p>
+        </div>
+
+        <div className="flex bg-[#EEF1F9] p-1.5 rounded-2xl border border-slate-100">
+          <button
+            onClick={() => navigate('otp')}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all duration-200 cursor-pointer ${
+              activeTab === 'otp'
+                ? 'bg-white text-[#7D53F6] shadow-sm'
+                : 'text-slate-500 hover:text-[#7D53F6]'
+            }`}
+          >
+            <Key size={16} />
+            <span>Mark Attendance</span>
+          </button>
+          <button
+            onClick={() => navigate('history')}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all duration-200 cursor-pointer ${
+              activeTab === 'history'
+                ? 'bg-white text-[#7D53F6] shadow-sm'
+                : 'text-slate-500 hover:text-[#7D53F6]'
+            }`}
+          >
+            <Layers size={16} />
+            <span>Attendance History</span>
+          </button>
+        </div>
       </div>
 
-      {/* Top row: Overall Stats & OTP submission card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 items-start">
-        {/* Left Column: Overall stats */}
-        <div className="lg:col-span-8">
-          <StudentStats stats={stats} />
-        </div>
-
-        {/* Right Column: OTP Code Entry Widget */}
-        <div className="lg:col-span-4">
-          <OTPAttendance onSuccess={fetchStudentAttendance} />
-        </div>
-      </div>
-
-      {/* Bottom row: Breakdown & history list */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-7">
-          <SubjectBreakdown records={records} />
-        </div>
-
-        <div className="lg:col-span-5">
-          <HistoryLogs records={records} />
-        </div>
-      </div>
+      {/* Render child sub-routes */}
+      <Outlet context={{ records, stats, fetchStudentAttendance }} />
     </div>
   );
 }

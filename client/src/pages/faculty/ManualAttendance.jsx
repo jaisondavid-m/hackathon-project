@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Search, CheckCircle, AlertCircle, UserCheck } from 'lucide-react';
 
-function ManualAttendance({ selectedClass, classes }) {
+import { useOutletContext } from 'react-router-dom';
+
+function ManualAttendance() {
+  const { selectedClass, classes } = useOutletContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [success, setSuccess] = useState('');
 

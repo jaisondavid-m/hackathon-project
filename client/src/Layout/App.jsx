@@ -4,8 +4,15 @@ import { authService } from '../api/auth';
 import Navbar from '../components/Navbar';
 import Login from '../pages/common/Login';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import UserManagement from '../pages/admin/UserManagement';
+import ConfigManagement from '../pages/admin/ConfigManagement';
+import AuditLogs from '../pages/admin/AuditLogs';
 import FacultyDashboard from '../pages/faculty/FacultyDashboard';
+import OTPGeneration from '../pages/faculty/OTPGeneration';
+import ManualAttendance from '../pages/faculty/ManualAttendance';
 import StudentDashboard from '../pages/student/StudentDashboard';
+import OTPAttendance from '../pages/student/OTPAttendance';
+import StudentHistory from '../pages/student/StudentHistory';
 import Home from '../pages/common/Home';
 
 function ProtectedRoute({ user, allowedRole }) {
@@ -121,15 +128,28 @@ function App() {
       {/* Protected dashboard routes with shared navbar layout */}
       <Route element={<AuthenticatedLayout user={user} onLogout={handleLogout} />}>
         <Route element={<ProtectedRoute user={user} allowedRole="admin" />}>
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />}>
+            <Route index element={<Navigate to="users" replace />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="config" element={<ConfigManagement />} />
+            <Route path="audit-logs" element={<AuditLogs />} />
+          </Route>
         </Route>
         
         <Route element={<ProtectedRoute user={user} allowedRole="faculty" />}>
-          <Route path="/faculty" element={<FacultyDashboard />} />
+          <Route path="/faculty" element={<FacultyDashboard />}>
+            <Route index element={<Navigate to="otp" replace />} />
+            <Route path="otp" element={<OTPGeneration />} />
+            <Route path="manual" element={<ManualAttendance />} />
+          </Route>
         </Route>
         
         <Route element={<ProtectedRoute user={user} allowedRole="student" />}>
-          <Route path="/student" element={<StudentDashboard user={user} />} />
+          <Route path="/student" element={<StudentDashboard user={user} />}>
+            <Route index element={<Navigate to="otp" replace />} />
+            <Route path="otp" element={<OTPAttendance />} />
+            <Route path="history" element={<StudentHistory />} />
+          </Route>
         </Route>
       </Route>
 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Calendar, Key, Layers, ClipboardList, Users } from 'lucide-react';
-import OTPGeneration from './OTPGeneration';
-import ManualAttendance from './ManualAttendance';
 
 function FacultyDashboard() {
-  const [activeTab, setActiveTab] = useState('otp'); // 'otp' or 'manual'
+  const location = useLocation();
+  const navigate = useNavigate();
   const [selectedClass, setSelectedClass] = useState('CS101');
 
   const classes = [
@@ -12,6 +12,14 @@ function FacultyDashboard() {
     { id: 'CS202', name: 'Data Structures (CS-B)', time: '11:30 AM - 12:30 PM', count: 4 },
     { id: 'CS305', name: 'Web Engineering', time: '02:00 PM - 03:00 PM', count: 5 },
   ];
+
+  // Determine active tab based on current path
+  const getActiveTab = () => {
+    if (location.pathname.includes('/faculty/manual')) return 'manual';
+    return 'otp';
+  };
+
+  const activeTab = getActiveTab();
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -28,7 +36,7 @@ function FacultyDashboard() {
         {/* Tab switcher */}
         <div className="flex bg-[#EEF1F9] p-1.5 rounded-2xl border border-slate-100/50">
           <button
-            onClick={() => setActiveTab('otp')}
+            onClick={() => navigate('otp')}
             className={`flex items-center gap-2 px-4 py-2 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'otp'
                 ? 'bg-white text-[#7D53F6] shadow-sm'
@@ -39,7 +47,7 @@ function FacultyDashboard() {
             <span>OTP & QR Code</span>
           </button>
           <button
-            onClick={() => setActiveTab('manual')}
+            onClick={() => navigate('manual')}
             className={`flex items-center gap-2 px-4 py-2 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'manual'
                 ? 'bg-white text-[#7D53F6] shadow-sm'
@@ -97,12 +105,7 @@ function FacultyDashboard() {
 
         {/* Right column: Action views */}
         <div className="lg:col-span-8">
-          {activeTab === 'otp' && (
-            <OTPGeneration selectedClass={selectedClass} classes={classes} />
-          )}
-          {activeTab === 'manual' && (
-            <ManualAttendance selectedClass={selectedClass} classes={classes} />
-          )}
+          <Outlet context={{ selectedClass, classes }} />
         </div>
       </div>
     </div>

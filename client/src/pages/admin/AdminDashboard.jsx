@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Users, Settings, Layers } from 'lucide-react';
-import UserManagement from './UserManagement';
-import ConfigManagement from './ConfigManagement';
-import AuditLogs from './AuditLogs';
 
 function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('users'); // 'users', 'config', or 'audit'
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Determine active tab based on current path
+  const getActiveTab = () => {
+    if (location.pathname.includes('/admin/config')) return 'config';
+    if (location.pathname.includes('/admin/audit-logs')) return 'audit';
+    return 'users';
+  };
+
+  const activeTab = getActiveTab();
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -20,7 +28,7 @@ function AdminDashboard() {
 
         <div className="flex bg-[#EEF1F9] p-1.5 rounded-2xl border border-slate-100">
           <button
-            onClick={() => setActiveTab('users')}
+            onClick={() => navigate('users')}
             className={`flex items-center gap-2 px-4 py-2 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'users'
                 ? 'bg-white text-[#7D53F6] shadow-sm'
@@ -31,7 +39,7 @@ function AdminDashboard() {
             <span>User Management</span>
           </button>
           <button
-            onClick={() => setActiveTab('config')}
+            onClick={() => navigate('config')}
             className={`flex items-center gap-2 px-4 py-2 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'config'
                 ? 'bg-white text-[#7D53F6] shadow-sm'
@@ -42,7 +50,7 @@ function AdminDashboard() {
             <span>Configurations</span>
           </button>
           <button
-            onClick={() => setActiveTab('audit')}
+            onClick={() => navigate('audit-logs')}
             className={`flex items-center gap-2 px-4 py-2 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'audit'
                 ? 'bg-white text-[#7D53F6] shadow-sm'
@@ -55,10 +63,8 @@ function AdminDashboard() {
         </div>
       </div>
 
-      {/* Conditionally render the active console view */}
-      {activeTab === 'users' && <UserManagement />}
-      {activeTab === 'config' && <ConfigManagement />}
-      {activeTab === 'audit' && <AuditLogs />}
+      {/* Render the active child sub-route view */}
+      <Outlet />
     </div>
   );
 }
