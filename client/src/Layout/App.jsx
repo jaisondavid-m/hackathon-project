@@ -17,6 +17,7 @@ import FacultyAttendance from '../pages/faculty/FacultyAttendance';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import OTPAttendance from '../pages/student/OTPAttendance';
 import StudentHistory from '../pages/student/StudentHistory';
+import StudentProfile from '../pages/student/StudentProfile';
 import Home from '../pages/common/Home';
 
 function ProtectedRoute({ user, allowedRole }) {
@@ -198,6 +199,7 @@ function App() {
             <Route index element={<Navigate to="otp" replace />} />
             <Route path="otp" element={<OTPAttendance />} />
             <Route path="history" element={<StudentHistory />} />
+            <Route path="profile" element={<StudentProfile />} />
           </Route>
         </Route>
       </Route>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock, ClipboardList, UserCheck } from 'lucide-react';
+import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock, ClipboardList, UserCheck, User } from 'lucide-react';
 
 function Sidebar({ user, mobileOpen, onCloseMobile }) {
   const location = useLocation();
@@ -22,6 +22,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     if (path.includes('/faculty/my-attendance')) return 'my-attendance';
     if (path.includes('/student/otp')) return 'student-otp';
     if (path.includes('/student/history')) return 'student-history';
+    if (path.includes('/student/profile')) return 'student-profile';
     return '';
   };
 
@@ -45,6 +46,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     student: [
       { id: 'student-otp', path: '/student/otp', label: 'Mark Attendance', icon: UserCheck },
       { id: 'student-history', path: '/student/history', label: 'Attendance History', icon: Layers },
+      { id: 'student-profile', path: '/student/profile', label: 'Profile', icon: User },
     ],
   };
 
