@@ -2,11 +2,18 @@ import React from 'react';
 import { CalendarDays, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
 function HistoryLogs({ records }) {
-  const subjectMap = {
-    CS101: { name: 'Computer Science' },
-    CS202: { name: 'Data Structures' },
-    CS305: { name: 'Web Engineering' },
-    MTH201: { name: 'Discrete Mathematics' },
+  // Mapping of hour numbers to unique subject names to vary them
+  const getSubjectNameByHour = (hourNumber, classId) => {
+    const defaultSubjects = {
+      1: 'Computer Science',
+      2: 'Data Structures',
+      3: 'Web Engineering',
+      4: 'Discrete Mathematics',
+      5: 'Operating Systems',
+      6: 'Computer Networks',
+      7: 'Database Systems'
+    };
+    return defaultSubjects[hourNumber] || classId;
   };
 
   const getStatusBadge = (status) => {
@@ -32,6 +39,14 @@ function HistoryLogs({ records }) {
     }
   };
 
+  // Sort logs by Date descending (latest first) and then by Hour ascending (1 to 7)
+  const sortedRecords = [...records].sort((a, b) => {
+    if (a.date !== b.date) {
+      return b.date.localeCompare(a.date);
+    }
+    return a.hour_number - b.hour_number;
+  });
+
   return (
     <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md p-6">
       <h2 className="text-xl font-bold text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2">
@@ -39,16 +54,16 @@ function HistoryLogs({ records }) {
         History Logs
       </h2>
 
-      <div className="space-y-4 max-h-[360px] overflow-y-auto pr-1">
-        {records.length > 0 ? (
-          records.map((item) => (
+      <div className="space-y-3">
+        {sortedRecords.length > 0 ? (
+          sortedRecords.map((item) => (
             <div
               key={item.id}
               className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 border border-slate-100/50 rounded-2xl transition-colors duration-150"
             >
               <div className="space-y-1 truncate pr-3">
                 <h4 className="font-semibold text-slate-700 text-sm leading-none truncate">
-                  {subjectMap[item.class_id]?.name || item.class_id}
+                  {getSubjectNameByHour(item.hour_number, item.class_id)}
                 </h4>
                 <span className="text-[10px] text-slate-400 font-bold block mt-1">
                   {item.date} &bull; Hour {item.hour_number}
