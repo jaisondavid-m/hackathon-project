@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"server/models"
 
@@ -18,28 +19,31 @@ import (
 var DB *gorm.DB
 
 func InitDB(dsn string) (*gorm.DB, error) {
-	// Register TiDB custom TLS configuration
-	rootCertPool := x509.NewCertPool()
-	pem, err := os.ReadFile("cert/isrgrootx1.pem")
-	if err != nil {
-		// Fallback to server/cert/isrgrootx1.pem if started from workspace root
-		pem, err = os.ReadFile("server/cert/isrgrootx1.pem")
+	if strings.Contains(dsn, "tls=tidb") {
+		// Register TiDB custom TLS configuration
+		rootCertPool := x509.NewCertPool()
+		pem, err := os.ReadFile("cert/isrgrootx1.pem")
 		if err != nil {
-			return nil, fmt.Errorf("failed to read cert file: %w", err)
+			// Fallback to server/cert/isrgrootx1.pem if started from workspace root
+			pem, err = os.ReadFile("server/cert/isrgrootx1.pem")
+			if err != nil {
+				return nil, fmt.Errorf("failed to read cert file: %w", err)
+			}
+		}
+		if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+			return nil, fmt.Errorf("failed to append PEM certificate to pool")
+		}
+
+		err = mysqlDriver.RegisterTLSConfig("tidb", &tls.Config{
+			RootCAs:    rootCertPool,
+			ServerName: "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to register custom TLS config: %w", err)
 		}
 	}
-	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-		return nil, fmt.Errorf("failed to append PEM certificate to pool")
-	}
 
-	err = mysqlDriver.RegisterTLSConfig("tidb", &tls.Config{
-		RootCAs:    rootCertPool,
-		ServerName: "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to register custom TLS config: %w", err)
-	}
-
+	var err error
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
@@ -48,7 +52,7 @@ func InitDB(dsn string) (*gorm.DB, error) {
 	log.Println("Database connection established successfully")
 
 	// Run migrations
-	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{}, &models.AttendanceSession{}, &models.AttendanceRecord{}, &models.Venue{})
+	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{}, &models.AttendanceSession{}, &models.AttendanceRecord{}, &models.Venue{}, &models.AuditLog{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to auto-migrate database: %w", err)
 	}
@@ -152,4 +156,18 @@ func SeedData() error {
 	}
 
 	return nil
+}
+
+// LogActivity saves a new system activity log
+func LogActivity(email, role, action, details, ip string) {
+	if DB != nil {
+		logEntry := models.AuditLog{
+			ActorEmail: email,
+			ActorRole:  role,
+			Action:     action,
+			Details:    details,
+			IPAddress:  ip,
+		}
+		DB.Create(&logEntry)
+	}
 }

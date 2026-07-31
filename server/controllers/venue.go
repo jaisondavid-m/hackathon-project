@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"server/database"
 	"server/models"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,17 @@ func (vc *VenueController) CreateVenue(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create venue"})
 		return
 	}
+
+	// Log venue creation event
+	adminEmail, _ := c.Get("emailid")
+	adminRole, _ := c.Get("role")
+	database.LogActivity(
+		adminEmail.(string),
+		adminRole.(string),
+		"Venue Created",
+		"Created new bounding geofenced venue: "+req.Name,
+		c.ClientIP(),
+	)
 
 	c.JSON(http.StatusCreated, req)
 }

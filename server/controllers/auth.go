@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"server/config"
+	"server/database"
 	"server/middleware"
 	"server/models"
 
@@ -73,6 +74,9 @@ func (ac *AuthController) Login(c *gin.Context) {
 		return
 	}
 
+	// Log login event
+	database.LogActivity(user.EmailID, user.Role, "Login Success", "Logged in to console", c.ClientIP())
+
 	c.JSON(http.StatusOK, models.LoginResponse{
 		Token: tokenString,
 		User:  user,
@@ -117,6 +121,17 @@ func (ac *AuthController) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
+
+	// Log creation event
+	adminEmail, _ := c.Get("emailid")
+	adminRole, _ := c.Get("role")
+	database.LogActivity(
+		adminEmail.(string),
+		adminRole.(string),
+		"Account Created",
+		"Created new user account: "+newUser.EmailID+" ("+newUser.Role+")",
+		c.ClientIP(),
+	)
 
 	c.JSON(http.StatusCreated, newUser)
 }

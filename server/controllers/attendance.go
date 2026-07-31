@@ -3,9 +3,11 @@ package controllers
 import (
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
+	"server/database"
 	"server/models"
 
 	"github.com/gin-gonic/gin"
@@ -107,6 +109,17 @@ func (ac *AttendanceController) StartAttendanceSession(c *gin.Context) {
 		return
 	}
 
+	// Log session start
+	facultyEmail, _ := c.Get("emailid")
+	facultyRole, _ := c.Get("role")
+	database.LogActivity(
+		facultyEmail.(string),
+		facultyRole.(string),
+		"OTP Session Created",
+		"Generated OTP "+session.OTP+" for class "+session.ClassID+" - Hour "+fmt.Sprintf("%d", session.HourNumber)+" at venue "+venue.Name,
+		c.ClientIP(),
+	)
+
 	c.JSON(http.StatusCreated, session)
 }
 
@@ -205,6 +218,17 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log attendance record"})
 		return
 	}
+
+	// Log attendance marked
+	studentEmail, _ := c.Get("emailid")
+	studentRole, _ := c.Get("role")
+	database.LogActivity(
+		studentEmail.(string),
+		studentRole.(string),
+		"Attendance Marked",
+		"Marked present for class "+record.ClassID+" - Hour "+fmt.Sprintf("%d", record.HourNumber)+" at venue "+venue.Name,
+		c.ClientIP(),
+	)
 
 	c.JSON(http.StatusOK, record)
 }

@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	log.Println("Starting Auth API server...")
+	log.Println("Starting API server...")
 
 	// Load Configuration
 	cfg := config.LoadConfig()

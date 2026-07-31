@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"server/database"
 	"server/models"
 
 	"github.com/gin-gonic/gin"
@@ -56,6 +57,17 @@ func (cc *ConfigController) SaveHourConfigs(c *gin.Context) {
 		return
 	}
 
+	// Log configurations edit
+	adminEmail, _ := c.Get("emailid")
+	adminRole, _ := c.Get("role")
+	database.LogActivity(
+		adminEmail.(string),
+		adminRole.(string),
+		"Hours Config Saved",
+		"Updated timeslots configurations for daily hours",
+		c.ClientIP(),
+	)
+
 	c.JSON(http.StatusOK, gin.H{"message": "Hour configurations saved successfully"})
 }
 
@@ -87,6 +99,21 @@ func (cc *ConfigController) SaveHoliday(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save calendar override"})
 		return
 	}
+
+	// Log calendar override
+	adminEmail, _ := c.Get("emailid")
+	adminRole, _ := c.Get("role")
+	statusStr := "Working Day"
+	if req.IsHoliday {
+		statusStr = "Holiday"
+	}
+	database.LogActivity(
+		adminEmail.(string),
+		adminRole.(string),
+		"Holiday Override Saved",
+		"Set date "+req.Date+" to status: "+statusStr+" ("+req.Name+")",
+		c.ClientIP(),
+	)
 
 	c.JSON(http.StatusOK, req)
 }
