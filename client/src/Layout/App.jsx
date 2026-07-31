@@ -11,7 +11,7 @@ import SessionDetails from '../pages/admin/SessionDetails';
 import AuditLogs from '../pages/admin/AuditLogs';
 import FacultyDashboard from '../pages/faculty/FacultyDashboard';
 import OTPGeneration from '../pages/faculty/OTPGeneration';
-import ManualAttendance from '../pages/faculty/ManualAttendance';
+import FacultyTimeTable from '../pages/faculty/FacultyTimeTable';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import OTPAttendance from '../pages/student/OTPAttendance';
 import StudentHistory from '../pages/student/StudentHistory';
@@ -45,7 +45,7 @@ function DashboardLayout({ user, onLogout }) {
     if (path.includes('/admin/session-details')) return 'Session Details';
     if (path.includes('/admin/audit-logs')) return 'Audit Logs';
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
-    if (path.includes('/faculty/manual')) return 'Manual Sheet';
+    if (path.includes('/faculty/timetable')) return 'Time Table';
     if (path.includes('/student/otp')) return 'Mark Attendance';
     if (path.includes('/student/history')) return 'Attendance History';
     return 'Dashboard';
@@ -182,7 +182,7 @@ function App() {
           <Route path="/faculty" element={<FacultyDashboard />}>
             <Route index element={<Navigate to="otp" replace />} />
             <Route path="otp" element={<OTPGeneration />} />
-            <Route path="manual" element={<ManualAttendance />} />
+            <Route path="timetable" element={<FacultyTimeTable />} />
           </Route>
         </Route>
         

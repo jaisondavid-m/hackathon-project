@@ -17,7 +17,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     if (path.includes('/admin/session-details')) return 'session-details';
     if (path.includes('/admin/audit-logs')) return 'audit';
     if (path.includes('/faculty/otp')) return 'otp';
-    if (path.includes('/faculty/manual')) return 'manual';
+    if (path.includes('/faculty/timetable')) return 'timetable';
     if (path.includes('/student/otp')) return 'student-otp';
     if (path.includes('/student/history')) return 'student-history';
     return '';
@@ -35,8 +35,8 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
       { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
     ],
     faculty: [
-      { id: 'otp', path: '/faculty/otp', label: 'OTP & QR Code', icon: Key },
-      { id: 'manual', path: '/faculty/manual', label: 'Manual Sheet', icon: Layers },
+      { id: 'otp', path: '/faculty/otp', label: 'Attendance', icon: Key },
+      { id: 'timetable', path: '/faculty/timetable', label: 'Time Table', icon: Calendar },
     ],
     student: [
       { id: 'student-otp', path: '/student/otp', label: 'Mark Attendance', icon: Key },
@@ -73,19 +73,18 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
           const Icon = item.icon;
           return (
             <button
-  key={item.id}
-  onClick={() => handleNavClick(item.path)}
-  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-0 ${
-    isActive
-      ? 'bg-[#7D53F6]/10 text-[#7D53F6] font-bold shadow-sm'
-      : 'text-slate-500 hover:bg-slate-50/50 hover:text-slate-800'
-  }`}
->
+              key={item.id}
+              onClick={() => handleNavClick(item.path)}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-0 ${
+                isActive
+                  ? 'bg-[#7D53F6] text-white font-bold shadow-md shadow-[#7D53F6]/25'
+                  : 'text-slate-500 hover:bg-slate-50/50 hover:text-slate-800'
+              }`}
+            >
               <div className="flex items-center gap-3">
-                <Icon size={18} className={isActive ? 'text-[#7D53F6]' : 'text-slate-400'} />
+                <Icon size={18} className={isActive ? 'text-white' : 'text-slate-400'} />
                 <span className="text-sm font-semibold tracking-wide">{item.label}</span>
               </div>
-              {isActive && <div className="w-1.5 h-1.5 rounded-full bg-[#7D53F6]" />}
             </button>
           );
         })}

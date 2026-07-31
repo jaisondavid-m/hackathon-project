@@ -9,7 +9,7 @@ import { configService } from '../../api/config';
 import { useOutletContext } from 'react-router-dom';
 
 function OTPGeneration() {
-  const { selectedClass, classes } = useOutletContext();
+  const { selectedClass, setSelectedClass, classes } = useOutletContext();
   const [selectedHour, setSelectedHour] = useState(1);
   const [otpError, setOtpError] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
@@ -189,6 +189,24 @@ function OTPGeneration() {
           )}
 
           <div className="space-y-4">
+            {/* Class / Course Selector */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Select Active Class / Course
+              </label>
+              <select
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                className="w-full px-3.5 py-2 border border-slate-200 bg-white text-slate-800 text-sm font-semibold rounded-xl focus:outline-none focus:border-[#7D53F6] focus:ring-2 focus:ring-[#7D53F6]/20 transition-all cursor-pointer"
+              >
+                {classes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} ({c.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Venue Selector */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">

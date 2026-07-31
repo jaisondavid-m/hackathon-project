@@ -17,7 +17,7 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
     if (path.includes('/admin/session-details')) return 'Session Details';
     if (path.includes('/admin/audit-logs')) return 'Audit Logs';
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
-    if (path.includes('/faculty/manual')) return 'Manual Sheet';
+    if (path.includes('/faculty/timetable')) return 'Time Table';
     if (path.includes('/student/otp')) return 'Mark Attendance';
     if (path.includes('/student/history')) return 'Attendance History';
     return 'Dashboard';
