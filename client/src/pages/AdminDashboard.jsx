@@ -453,17 +453,44 @@ function AdminDashboard() {
     return colors[Math.abs(hash) % colors.length];
   };
 
-  const getAuthType = (log) => {
-    const action = (log.action || '').toLowerCase();
-    const details = (log.details || '').toLowerCase();
+  const getMethodBadge = (m) => {
+    switch (m.toUpperCase()) {
+      case 'GET': return 'bg-emerald-50 text-emerald-600 border border-emerald-100/50';
+      case 'POST': return 'bg-blue-50 text-blue-600 border border-blue-100/50';
+      case 'PUT': return 'bg-amber-50 text-amber-600 border border-amber-100/50';
+      case 'DELETE': return 'bg-rose-50 text-rose-600 border border-rose-100/50';
+      default: return 'bg-slate-50 text-slate-600 border border-slate-100/50';
+    }
+  };
 
-    if (action.includes('fail')) {
-      return { label: 'IP Flagged', color: 'bg-rose-500' };
+  const getStatusBadge = (s) => {
+    if (!s) return '';
+    const code = parseInt(s, 10);
+    if (isNaN(code)) return 'bg-slate-50 text-slate-600 border border-slate-100/50';
+    if (code >= 200 && code < 300) {
+      return 'bg-emerald-50 text-emerald-600 border border-emerald-100/50';
     }
-    if (details.includes('biometric')) {
-      return { label: 'Biometric', color: 'bg-[#7D53F6]' };
+    if (code >= 300 && code < 400) {
+      return 'bg-amber-50 text-amber-600 border border-amber-100/50';
     }
-    return { label: 'SSO Verified', color: 'bg-[#7D53F6]' };
+    // 400+, 401, etc.
+    return 'bg-rose-50 text-rose-600 border border-rose-100/50 font-bold';
+  };
+
+  const parseDetails = (detailsStr) => {
+    if (!detailsStr) return { status: '', duration: '', body: '' };
+    const parts = detailsStr.split(' | ');
+    let status = '';
+    let duration = '';
+    let body = '';
+    
+    parts.forEach(p => {
+      if (p.startsWith('Status:')) status = p.replace('Status:', '').trim();
+      if (p.startsWith('Duration:')) duration = p.replace('Duration:', '').trim();
+      if (p.startsWith('Body:')) body = p.replace('Body:', '').trim();
+    });
+    
+    return { status, duration, body };
   };
 
   const formatLogDate = (dateStr) => {
@@ -511,7 +538,7 @@ function AdminDashboard() {
             }`}
           >
             <Users size={16} />
-            <span>Accounts</span>
+            <span>User Management</span>
           </button>
           <button
             onClick={() => setActiveTab('config')}
@@ -1270,10 +1297,13 @@ function AdminDashboard() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-50/50 text-[10px] text-slate-400 font-extrabold uppercase tracking-widest border-b border-slate-100">
-                      <th className="py-4 pl-6 pr-4">User Email</th>
-                      <th className="py-4 px-4">Role</th>
-                      <th className="py-4 px-4">Login Time</th>
-                      <th className="py-4 px-4">Authentication</th>
+                      <th className="py-4 pl-6 pr-4">User</th>
+                      <th className="py-4 px-4">IP Address</th>
+                      <th className="py-4 px-4">Action Type</th>
+                      <th className="py-4 px-4">Path</th>
+                      <th className="py-4 px-4">Status</th>
+                      <th className="py-4 px-4">Body Details</th>
+                      <th className="py-4 px-4">Time</th>
                       <th className="py-4 pr-6 pl-4 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -1281,50 +1311,103 @@ function AdminDashboard() {
                     {paginatedLogs.map((log) => {
                       const initials = getInitials(log.actor_email);
                       const initialsBg = getInitialsBg(log.actor_email);
-                      const authInfo = getAuthType(log);
+                      
+                      // Parse method and path
+                      const actionStr = log.action || '';
+                      const firstSpaceIdx = actionStr.indexOf(' ');
+                      let method = 'INFO';
+                      let path = actionStr;
+
+                      if (firstSpaceIdx > 0) {
+                        const possibleMethod = actionStr.substring(0, firstSpaceIdx);
+                        if (['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'].includes(possibleMethod.toUpperCase())) {
+                          method = possibleMethod.toUpperCase();
+                          path = actionStr.substring(firstSpaceIdx + 1);
+                        }
+                      }
+
+                      // Parse details (status, duration, body)
+                      const { status, duration, body } = parseDetails(log.details);
+
                       return (
                         <tr key={log.id} className="hover:bg-slate-50/30 transition-colors">
-                          {/* User Email */}
-                          <td className="py-4 pl-6 pr-4 flex items-center gap-3">
-                            <div className={`w-9 h-9 rounded-full ${initialsBg} flex items-center justify-center font-bold text-xs shadow-sm flex-shrink-0`}>
-                              {initials}
+                          {/* User Column */}
+                          <td className="py-4 pl-6 pr-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-9 h-9 rounded-full ${initialsBg} flex items-center justify-center font-bold text-xs shadow-sm flex-shrink-0`}>
+                                {initials}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-semibold text-slate-700 text-xs sm:text-sm leading-snug">{log.actor_email}</span>
+                                <span className={`text-[9px] font-bold uppercase tracking-wider mt-0.5 max-w-max px-1.5 py-0.5 rounded ${
+                                  log.actor_role === 'student'
+                                    ? 'bg-purple-50 text-purple-600'
+                                    : log.actor_role === 'faculty'
+                                    ? 'bg-blue-50 text-blue-600'
+                                    : 'bg-amber-50 text-amber-600'
+                                }`}>
+                                  {log.actor_role}
+                                </span>
+                              </div>
                             </div>
-                            <span className="font-semibold text-slate-700 text-xs sm:text-sm">{log.actor_email}</span>
                           </td>
 
-                          {/* Role */}
+                          {/* IP Address */}
+                          <td className="py-4 px-4 font-mono text-xs text-slate-600">
+                            {log.ip_address || '127.0.0.1'}
+                          </td>
+
+                          {/* Action Type */}
                           <td className="py-4 px-4">
-                            <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${
-                              log.actor_role === 'student'
-                                ? 'bg-purple-50 text-purple-600 border border-purple-100/50'
-                                : log.actor_role === 'faculty'
-                                ? 'bg-blue-50 text-blue-600 border border-blue-100/50'
-                                : 'bg-amber-50 text-amber-600 border border-amber-100/50'
-                            }`}>
-                              {log.actor_role}
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${getMethodBadge(method)}`}>
+                              {method}
                             </span>
                           </td>
 
-                          {/* Login Time */}
+                          {/* Path */}
+                          <td className="py-4 px-4">
+                            <span className="font-mono text-xs text-slate-700 font-bold max-w-[160px] truncate block" title={path}>{path}</span>
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-4 px-4">
+                            {status ? (
+                              <span className={`px-1.5 py-0.5 rounded font-black text-xs ${getStatusBadge(status)}`}>
+                                {status}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 text-xs">-</span>
+                            )}
+                          </td>
+
+                          {/* Body Details */}
+                          <td className="py-4 px-4 max-w-xs">
+                            <div className="flex flex-col gap-1">
+                              {body ? (
+                                <span className="font-mono text-[10px] text-slate-500 bg-slate-50 border border-slate-100 rounded px-1.5 py-0.5 block truncate max-w-[200px]" title={body}>
+                                  {body}
+                                </span>
+                              ) : (
+                                <span className="text-slate-400 italic text-[10px] truncate max-w-[200px] block" title={log.details}>
+                                  {log.details || 'No parameters'}
+                                </span>
+                              )}
+                              {duration && <span className="text-[9px] text-slate-400">Duration: {duration}</span>}
+                            </div>
+                          </td>
+
+                          {/* Timestamp */}
                           <td className="py-4 px-4 text-xs font-semibold text-slate-500">
                             {formatLogDate(log.created_at)}
                           </td>
 
-                          {/* Authentication Status Bullet */}
-                          <td className="py-4 px-4">
-                            <span className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-                              <span className={`w-2 h-2 rounded-full ${authInfo.color}`} />
-                              {authInfo.label}
-                            </span>
-                          </td>
-
-                          {/* Action Edit Icon */}
-                          <td className="py-4 pr-6 pl-4 text-right">
+                          {/* Actions */}
+                          <td className="py-4 pr-6 pl-4 text-right whitespace-nowrap">
                             <button
                               onClick={() => setSelectedAuditLog(log)}
-                              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                              className="px-3 py-1.5 bg-[#7D53F6]/10 hover:bg-[#7D53F6] text-[#7D53F6] hover:text-white font-bold text-xs rounded-xl transition-all duration-200 cursor-pointer shadow-sm"
                             >
-                              <Pencil size={14} />
+                              View Details
                             </button>
                           </td>
                         </tr>

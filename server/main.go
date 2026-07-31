@@ -35,6 +35,9 @@ func main() {
 	// Set up router
 	r := gin.Default()
 
+	// Register Global Audit Logging Middleware
+	r.Use(middleware.AuditLogMiddleware())
+
 	// Simple CORS Middleware
 	r.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
