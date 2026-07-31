@@ -57,6 +57,18 @@ func (ac *AuthController) Login(c *gin.Context) {
 		return
 	}
 
+	// Check if user is blocked
+	if user.IsBlocked {
+		database.LogActivity(user.EmailID, user.Role, "Login Failed", "Blocked account login attempt", c.ClientIP())
+		c.JSON(http.StatusForbidden, gin.H{"error": "Your account has been blocked by an administrator."})
+		return
+	}
+
+	// Update last sign in timestamp
+	now := time.Now()
+	user.LastSignIn = &now
+	ac.DB.Save(&user)
+
 	// Generate JWT Token
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &middleware.Claims{
@@ -155,6 +167,59 @@ func (ac *AuthController) GetProfile(c *gin.Context) {
 		}
 		return
 	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+// GetUsers lists all registered users in the database (Admin only)
+func (ac *AuthController) GetUsers(c *gin.Context) {
+	var users []models.User
+	if err := ac.DB.Order("created_at desc").Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}
+
+// ToggleBlockUser blocks or unblocks a user by ID (Admin only)
+func (ac *AuthController) ToggleBlockUser(c *gin.Context) {
+	id := c.Param("id")
+	var user models.User
+	if err := ac.DB.First(&user, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		}
+		return
+	}
+
+	// Don't allow admins to block themselves
+	adminEmail, _ := c.Get("emailid")
+	if user.EmailID == adminEmail.(string) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You cannot block your own admin account"})
+		return
+	}
+
+	user.IsBlocked = !user.IsBlocked
+	if err := ac.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user block status"})
+		return
+	}
+
+	// Log event
+	actionStr := "Account Unblocked"
+	if user.IsBlocked {
+		actionStr = "Account Blocked"
+	}
+	adminRole, _ := c.Get("role")
+	database.LogActivity(
+		adminEmail.(string),
+		adminRole.(string),
+		actionStr,
+		"Toggled block status for user: "+user.EmailID,
+		c.ClientIP(),
+	)
 
 	c.JSON(http.StatusOK, user)
 }

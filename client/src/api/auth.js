@@ -39,6 +39,23 @@ export const authService = {
   },
 
   /**
+   * Fetches all registered users (Admin only)
+   */
+  async getUsers() {
+    const response = await api.get('/admin/users');
+    return response.data;
+  },
+
+  /**
+   * Blocks or unblocks a user by ID (Admin only)
+   * @param {number|string} id User ID
+   */
+  async toggleBlockUser(id) {
+    const response = await api.post(`/admin/users/${id}/toggle-block`);
+    return response.data;
+  },
+
+  /**
    * Clears auth data and logs out
    */
   logout() {

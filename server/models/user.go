@@ -13,14 +13,16 @@ const (
 )
 
 type User struct {
-	ID        uint           `gorm:"primaryKey" json:"id"`
-	Name      string         `gorm:"size:255;not null" json:"name"`
-	EmailID   string         `gorm:"column:emailid;size:255;uniqueIndex;not null" json:"emailid"`
-	Password  string         `gorm:"size:255;not null" json:"-"`
-	Role      string         `gorm:"type:varchar(50);not null" json:"role"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	ID         uint           `gorm:"primaryKey" json:"id"`
+	Name       string         `gorm:"size:255;not null" json:"name"`
+	EmailID    string         `gorm:"column:emailid;size:255;uniqueIndex;not null" json:"emailid"`
+	Password   string         `gorm:"size:255;not null" json:"-"`
+	Role       string         `gorm:"type:varchar(50);not null" json:"role"`
+	IsBlocked  bool           `gorm:"column:is_blocked;default:false" json:"is_blocked"`
+	LastSignIn *time.Time     `gorm:"column:last_sign" json:"last_sign"`
+	CreatedAt  time.Time      `json:"created_at"`
+	UpdatedAt  time.Time      `json:"updated_at"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 type LoginRequest struct {

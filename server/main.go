@@ -87,6 +87,8 @@ func main() {
 		adminOnly.Use(middleware.RequireRole(models.RoleAdmin))
 		{
 			adminOnly.POST("/users", authController.CreateUser)
+			adminOnly.GET("/users", authController.GetUsers)
+			adminOnly.POST("/users/:id/toggle-block", authController.ToggleBlockUser)
 			adminOnly.POST("/hours", configController.SaveHourConfigs)
 			adminOnly.POST("/holidays", configController.SaveHoliday)
 			adminOnly.POST("/venues", venueController.CreateVenue)
