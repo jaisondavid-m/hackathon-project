@@ -69,14 +69,14 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
           const Icon = item.icon;
           return (
             <button
-              key={item.id}
-              onClick={() => handleNavClick(item.path)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-200 cursor-pointer ${
-                isActive
-                  ? 'bg-[#7D53F6]/10 text-[#7D53F6] font-bold border border-[#7D53F6]/10 shadow-sm'
-                  : 'text-slate-500 hover:bg-slate-50/50 hover:text-slate-800'
-              }`}
-            >
+  key={item.id}
+  onClick={() => handleNavClick(item.path)}
+  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-0 ${
+    isActive
+      ? 'bg-[#7D53F6]/10 text-[#7D53F6] font-bold shadow-sm'
+      : 'text-slate-500 hover:bg-slate-50/50 hover:text-slate-800'
+  }`}
+>
               <div className="flex items-center gap-3">
                 <Icon size={18} className={isActive ? 'text-[#7D53F6]' : 'text-slate-400'} />
                 <span className="text-sm font-semibold tracking-wide">{item.label}</span>
@@ -112,7 +112,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
               </div>
               <button 
                 onClick={onCloseMobile}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-none"
               >
                 <X size={20} />
               </button>
