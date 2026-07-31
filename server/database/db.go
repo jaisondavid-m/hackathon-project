@@ -23,13 +23,13 @@ func InitDB(dsn string) (*gorm.DB, error) {
 	log.Println("Database connection established successfully")
 
 	// Run migrations
-	err = DB.AutoMigrate(&models.User{})
+	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to auto-migrate database: %w", err)
 	}
 	log.Println("Database auto-migration completed")
 
-	// Seed test accounts if table is empty
+	// Seed test accounts and hours config if tables are empty
 	err = SeedData()
 	if err != nil {
 		log.Printf("Warning: Seeding test data failed: %v\n", err)
@@ -80,6 +80,27 @@ func SeedData() error {
 			log.Printf("Seeded: %s | EmailID: %s | Password: %s | Role: %s\n", u.name, u.email, u.password, u.role)
 		}
 		log.Println("----------------------------------------------------------------------")
+	}
+
+	// Seed Hour Configurations
+	var hourCount int64
+	if err := DB.Model(&models.HourConfig{}).Count(&hourCount).Error; err == nil && hourCount == 0 {
+		defaultHours := []models.HourConfig{
+			{HourNumber: 1, StartTime: "09:00 AM", EndTime: "10:00 AM"},
+			{HourNumber: 2, StartTime: "10:00 AM", EndTime: "11:00 AM"},
+			{HourNumber: 3, StartTime: "11:00 AM", EndTime: "12:00 PM"},
+			{HourNumber: 4, StartTime: "12:00 PM", EndTime: "01:00 PM"},
+			{HourNumber: 5, StartTime: "02:00 PM", EndTime: "03:00 PM"},
+			{HourNumber: 6, StartTime: "03:00 PM", EndTime: "04:00 PM"},
+			{HourNumber: 7, StartTime: "04:00 PM", EndTime: "05:00 PM"},
+		}
+
+		log.Println("Seeding default 7-hour config...")
+		for _, h := range defaultHours {
+			if err := DB.Create(&h).Error; err != nil {
+				log.Printf("Warning: failed to seed hour %d: %v\n", h.HourNumber, err)
+			}
+		}
 	}
 
 	return nil

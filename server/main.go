@@ -27,6 +27,7 @@ func main() {
 
 	// Initialize Controllers
 	authController := controllers.NewAuthController(db, cfg)
+	configController := controllers.NewConfigController(db)
 
 	// Set up router
 	r := gin.Default()
@@ -54,12 +55,16 @@ func main() {
 	protected.Use(middleware.AuthMiddleware(cfg.JWTSecret))
 	{
 		protected.GET("/profile", authController.GetProfile)
+		protected.GET("/hours", configController.GetHourConfigs)
+		protected.GET("/holidays", configController.GetHolidays)
 
 		// Admin-Only Routes
 		adminOnly := protected.Group("/admin")
 		adminOnly.Use(middleware.RequireRole(models.RoleAdmin))
 		{
 			adminOnly.POST("/users", authController.CreateUser)
+			adminOnly.POST("/hours", configController.SaveHourConfigs)
+			adminOnly.POST("/holidays", configController.SaveHoliday)
 		}
 	}
 
