@@ -65,20 +65,20 @@ function Login({ onLoginSuccess }) {
         <div className="bg-white rounded-3xl border border-slate-100/80 shadow-2xl p-6 sm:p-8 transition-all duration-300">
           
           {/* Logo & Branding */}
-          <div className="flex items-center gap-3 mb-5">
-            <img src="/logo.png" alt="PCDP Logo" className="h-10 w-auto flex-shrink-0" />
-            <div>
+          <div className="flex flex-col items-center justify-center text-center gap-2 mb-6">
+            <img src="/logo.png" alt="PCDP Logo" className="h-12 w-auto flex-shrink-0" />
+            <div className="flex flex-col items-center">
               <div className="text-xl font-extrabold text-[#7D53F6] tracking-tight leading-none">
                 PCDP 4.0
               </div>
-              <div className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest mt-1 leading-none">
+              <div className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest mt-1.5 leading-none">
                 Enterprise Attendance
               </div>
             </div>
           </div>
 
           {/* Welcome Titles */}
-          <div className="mb-4">
+          <div className="mb-4 text-center">
             <h2 className="text-lg font-bold text-slate-800 tracking-tight leading-snug">
               Welcome back
             </h2>
