@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { attendanceService } from '../../api/attendance';
 import { venueService } from '../../api/venue';
+import { configService } from '../../api/config';
 
 import { useOutletContext } from 'react-router-dom';
 
@@ -17,6 +18,7 @@ function OTPGeneration() {
   const [scannedStudents, setScannedStudents] = useState([]);
   const [venues, setVenues] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState('');
+  const [todayOverride, setTodayOverride] = useState(null);
 
   const timerRef = useRef(null);
   const pollRef = useRef(null);
@@ -25,11 +27,33 @@ function OTPGeneration() {
   useEffect(() => {
     fetchActiveSession();
     fetchVenues();
+    checkTodayStatus();
     return () => {
       stopTimer();
       stopPolling();
     };
   }, [selectedClass]);
+
+  const checkTodayStatus = async () => {
+    try {
+      const holidaysList = await configService.getHolidays();
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const todayStr = `${year}-${month}-${day}`;
+
+      const override = holidaysList.find(h => h.date === todayStr);
+      if (override) {
+        setTodayOverride(override);
+        if (override.is_half_day && selectedHour > 4) {
+          setSelectedHour(1);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch today status check:', err);
+    }
+  };
 
   const fetchVenues = async () => {
     try {
@@ -187,13 +211,32 @@ function OTPGeneration() {
               </select>
             </div>
 
+            {/* Holiday or Half Day warnings */}
+            {todayOverride && todayOverride.is_holiday && (
+              <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-start gap-3 text-rose-700 text-xs font-semibold">
+                <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong>Holiday Notice:</strong> Today is configured as a Holiday ({todayOverride.name}). Marking attendance is disabled.
+                </div>
+              </div>
+            )}
+
+            {todayOverride && todayOverride.is_half_day && (
+              <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-3 text-amber-700 text-xs font-semibold">
+                <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong>Half Day Notice:</strong> Today is configured as a Half Day ({todayOverride.name}). Only hours H1 to H4 are active.
+                </div>
+              </div>
+            )}
+
             {/* Hour Number Selector */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Select Current Hour (Period)
               </label>
               <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                {[1, 2, 3, 4, 5, 6, 7].map((hr) => (
+                {(todayOverride && todayOverride.is_half_day ? [1, 2, 3, 4] : [1, 2, 3, 4, 5, 6, 7]).map((hr) => (
                   <button
                     key={hr}
                     type="button"
@@ -220,8 +263,12 @@ function OTPGeneration() {
             {/* Submit generate */}
             <button
               onClick={handleGenerateOTP}
-              disabled={otpLoading}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-[#7D53F6] hover:bg-[#683cdb] text-white font-bold rounded-2xl shadow-lg shadow-[#7D53F6]/20 transition-all duration-200 cursor-pointer"
+              disabled={otpLoading || (todayOverride && todayOverride.is_holiday)}
+              className={`w-full flex items-center justify-center gap-2 py-3 font-bold rounded-2xl transition-all duration-200 ${
+                (todayOverride && todayOverride.is_holiday)
+                  ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
+                  : 'bg-[#7D53F6] hover:bg-[#683cdb] text-white shadow-lg shadow-[#7D53F6]/20 cursor-pointer'
+              }`}
             >
               {otpLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

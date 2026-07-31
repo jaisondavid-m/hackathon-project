@@ -91,6 +91,7 @@ func main() {
 			adminOnly.POST("/users/:id/toggle-block", authController.ToggleBlockUser)
 			adminOnly.POST("/hours", configController.SaveHourConfigs)
 			adminOnly.POST("/holidays", configController.SaveHoliday)
+			adminOnly.POST("/holidays/batch", configController.SaveHolidayBatch)
 			adminOnly.POST("/venues", venueController.CreateVenue)
 			adminOnly.PUT("/venues/:id", venueController.UpdateVenue)
 			adminOnly.GET("/audit-logs", auditController.GetAuditLogs)

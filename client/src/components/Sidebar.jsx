@@ -28,11 +28,11 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
   // Define role-specific menus
   const menuItems = {
     admin: [
-      { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
       { id: 'venues', path: '/admin/venues', label: 'Venue Management', icon: MapPin },
       { id: 'working-days', path: '/admin/working-days', label: 'Working Day Mapping', icon: Calendar },
       { id: 'session-details', path: '/admin/session-details', label: 'Session Details', icon: Clock },
       { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', icon: Layers },
+      { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
     ],
     faculty: [
       { id: 'otp', path: '/faculty/otp', label: 'OTP & QR Code', icon: Key },

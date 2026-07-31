@@ -14,4 +14,5 @@ type HolidayConfig struct {
 	Date      string `gorm:"primaryKey;size:20" json:"date"` // Format: YYYY-MM-DD
 	Name      string `gorm:"size:255" json:"name"`
 	IsHoliday bool   `gorm:"default:true" json:"is_holiday"`
+	IsHalfDay bool   `gorm:"column:is_half_day;default:false" json:"is_half_day"`
 }

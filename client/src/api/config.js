@@ -40,9 +40,19 @@ export const configService = {
    * @param {string} param0.date YYYY-MM-DD
    * @param {string} param0.name Reason description
    * @param {boolean} param0.is_holiday True for holiday, False for working day
+   * @param {boolean} param0.is_half_day True for half day
    */
-  async saveHoliday({ date, name, is_holiday }) {
-    const response = await api.post('/admin/holidays', { date, name, is_holiday });
+  async saveHoliday({ date, name, is_holiday, is_half_day }) {
+    const response = await api.post('/admin/holidays', { date, name, is_holiday, is_half_day });
+    holidaysCache = null; // Invalidate cache
+    return response.data;
+  },
+
+  /**
+   * Batch updates calendar status overrides for a range of dates (Admin only)
+   */
+  async saveHolidayBatch({ start_date, end_date, name, is_holiday, is_half_day }) {
+    const response = await api.post('/admin/holidays/batch', { start_date, end_date, name, is_holiday, is_half_day });
     holidaysCache = null; // Invalidate cache
     return response.data;
   }

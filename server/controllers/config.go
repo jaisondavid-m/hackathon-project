@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"server/database"
 	"server/models"
@@ -106,6 +107,8 @@ func (cc *ConfigController) SaveHoliday(c *gin.Context) {
 	statusStr := "Working Day"
 	if req.IsHoliday {
 		statusStr = "Holiday"
+	} else if req.IsHalfDay {
+		statusStr = "Half Day"
 	}
 	database.LogActivity(
 		adminEmail.(string),
@@ -116,4 +119,77 @@ func (cc *ConfigController) SaveHoliday(c *gin.Context) {
 	)
 
 	c.JSON(http.StatusOK, req)
+}
+
+type BatchHolidayRequest struct {
+	StartDate string `json:"start_date" binding:"required"`
+	EndDate   string `json:"end_date" binding:"required"`
+	Name      string `json:"name"`
+	IsHoliday bool   `json:"is_holiday"`
+	IsHalfDay bool   `json:"is_half_day"`
+}
+
+// SaveHolidayBatch saves calendar overrides for a range of dates (Admin only)
+func (cc *ConfigController) SaveHolidayBatch(c *gin.Context) {
+	var req BatchHolidayRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	start, err := time.Parse("2006-01-02", req.StartDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid start date format, must be YYYY-MM-DD"})
+		return
+	}
+
+	end, err := time.Parse("2006-01-02", req.EndDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid end date format, must be YYYY-MM-DD"})
+		return
+	}
+
+	if start.After(end) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Start date cannot be after end date"})
+		return
+	}
+
+	var savedConfigs []models.HolidayConfig
+
+	// Loop through dates
+	for d := start; !d.After(end); d = d.AddDate(0, 0, 1) {
+		dateStr := d.Format("2006-01-02")
+		config := models.HolidayConfig{
+			Date:      dateStr,
+			Name:      req.Name,
+			IsHoliday: req.IsHoliday,
+			IsHalfDay: req.IsHalfDay,
+		}
+
+		if err := cc.DB.Save(&config).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save calendar override at " + dateStr})
+			return
+		}
+		savedConfigs = append(savedConfigs, config)
+	}
+
+	// Log event
+	adminEmail, _ := c.Get("emailid")
+	adminRole, _ := c.Get("role")
+	statusStr := "Working Day"
+	if req.IsHoliday {
+		statusStr = "Holiday"
+	} else if req.IsHalfDay {
+		statusStr = "Half Day"
+	}
+
+	database.LogActivity(
+		adminEmail.(string),
+		adminRole.(string),
+		"Batch Holiday Override Saved",
+		"Set dates from "+req.StartDate+" to "+req.EndDate+" to status: "+statusStr+" ("+req.Name+")",
+		c.ClientIP(),
+	)
+
+	c.JSON(http.StatusOK, savedConfigs)
 }
