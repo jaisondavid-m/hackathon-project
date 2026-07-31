@@ -1,0 +1,128 @@
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Users, Settings, Layers, Key, X } from 'lucide-react';
+
+function Sidebar({ user, mobileOpen, onCloseMobile }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  if (!user) return null;
+
+  // Determine active item based on current route path
+  const getActiveItem = () => {
+    const path = location.pathname;
+    if (path.includes('/admin/users')) return 'users';
+    if (path.includes('/admin/config')) return 'config';
+    if (path.includes('/admin/audit-logs')) return 'audit';
+    if (path.includes('/faculty/otp')) return 'otp';
+    if (path.includes('/faculty/manual')) return 'manual';
+    if (path.includes('/student/otp')) return 'student-otp';
+    if (path.includes('/student/history')) return 'student-history';
+    return '';
+  };
+
+  const activeItem = getActiveItem();
+
+  // Define role-specific menus
+  const menuItems = {
+    admin: [
+      { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
+      { id: 'config', path: '/admin/config', label: 'Configuration', icon: Settings },
+      { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', icon: Layers },
+    ],
+    faculty: [
+      { id: 'otp', path: '/faculty/otp', label: 'OTP & QR Code', icon: Key },
+      { id: 'manual', path: '/faculty/manual', label: 'Manual Sheet', icon: Layers },
+    ],
+    student: [
+      { id: 'student-otp', path: '/student/otp', label: 'Mark Attendance', icon: Key },
+      { id: 'student-history', path: '/student/history', label: 'Attendance History', icon: Layers },
+    ],
+  };
+
+  const currentMenu = menuItems[user.role] || [];
+
+  const handleNavClick = (path) => {
+    navigate(path);
+    if (onCloseMobile) onCloseMobile();
+  };
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-white flex-grow">
+      {/* Logo area */}
+      <div className="h-16 px-6 border-b border-slate-100 flex items-center gap-3 flex-shrink-0">
+        <img src="/logo.png" alt="PCDP Logo" className="h-8 w-auto flex-shrink-0" />
+        <span className="font-black text-slate-800 text-lg sm:text-xl">
+          PCDP <span className="text-[#7D53F6]">v4.0</span>
+        </span>
+      </div>
+
+      {/* Menu Label */}
+      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-6 mt-6 mb-2 flex-shrink-0">
+        Main Menu
+      </div>
+
+      {/* Menu Navigation List */}
+      <nav className="flex-grow space-y-1.5 px-3 overflow-y-auto">
+        {currentMenu.map((item) => {
+          const isActive = activeItem === item.id;
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleNavClick(item.path)}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-200 cursor-pointer ${
+                isActive
+                  ? 'bg-[#7D53F6]/10 text-[#7D53F6] font-bold border border-[#7D53F6]/10 shadow-sm'
+                  : 'text-slate-500 hover:bg-slate-50/50 hover:text-slate-800'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Icon size={18} className={isActive ? 'text-[#7D53F6]' : 'text-slate-400'} />
+                <span className="text-sm font-semibold tracking-wide">{item.label}</span>
+              </div>
+              {isActive && <div className="w-1.5 h-1.5 rounded-full bg-[#7D53F6]" />}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Footer info */}
+      <div className="p-6 border-t border-slate-100/50 text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center flex-shrink-0">
+        &copy; {new Date().getFullYear()} PCDP Attendance
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex flex-col w-64 xl:w-72 border-r border-slate-100 shadow-sm h-screen sticky top-0 flex-shrink-0 z-30">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer Overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 lg:hidden">
+          <aside className="w-64 bg-white h-full shadow-2xl flex flex-col animate-slideRight">
+            <div className="h-16 px-6 border-b border-slate-100 flex justify-between items-center flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <img src="/logo.png" alt="PCDP Logo" className="h-7 w-auto flex-shrink-0" />
+                <span className="font-black text-slate-800 text-lg">PCDP v4.0</span>
+              </div>
+              <button 
+                onClick={onCloseMobile}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
+    </>
+  );
+}
+
+export default Sidebar;

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  LogIn, GraduationCap, Award, AlertCircle, Search, Filter, Calendar, ChevronLeft, ChevronRight 
+  LogIn, GraduationCap, Award, AlertCircle, Search, Filter, Calendar, ChevronLeft, ChevronRight, RefreshCw 
 } from 'lucide-react';
 import { auditService } from '../../api/audit';
 
@@ -21,11 +21,11 @@ function AuditLogs() {
     fetchAuditLogs();
   }, []);
 
-  const fetchAuditLogs = async () => {
+  const fetchAuditLogs = async (force = false) => {
     try {
       setAuditLoading(true);
       setAuditError('');
-      const logs = await auditService.getAuditLogs();
+      const logs = await auditService.getAuditLogs(force);
       setAuditLogs(logs);
     } catch (err) {
       console.error('Failed to load audit logs:', err);
@@ -35,73 +35,88 @@ function AuditLogs() {
     }
   };
 
-  // Sort database logs, newest first
-  const displayLogs = [...auditLogs].sort(
-    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-  );
+  // Sort database logs, newest first (memoized)
+  const displayLogs = useMemo(() => {
+    return [...auditLogs].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+  }, [auditLogs]);
 
-  // Filter display logs based on search query, role filter, start date, end date
-  const filteredLogs = displayLogs.filter((log) => {
-    // Search Query
-    const searchLower = auditSearchQuery.toLowerCase();
-    const matchesSearch =
-      (log.actor_email || '').toLowerCase().includes(searchLower) ||
-      (log.actor_role || '').toLowerCase().includes(searchLower) ||
-      (log.action || '').toLowerCase().includes(searchLower) ||
-      (log.ip_address || '').toLowerCase().includes(searchLower);
+  // Filter display logs based on search query, role filter, start date, end date (memoized)
+  const filteredLogs = useMemo(() => {
+    return displayLogs.filter((log) => {
+      // Search Query
+      const searchLower = auditSearchQuery.toLowerCase();
+      const matchesSearch =
+        (log.actor_email || '').toLowerCase().includes(searchLower) ||
+        (log.actor_role || '').toLowerCase().includes(searchLower) ||
+        (log.action || '').toLowerCase().includes(searchLower) ||
+        (log.ip_address || '').toLowerCase().includes(searchLower);
 
-    // Role Filter
-    const matchesRole =
-      auditRoleFilter === 'all' || log.actor_role === auditRoleFilter;
+      // Role Filter
+      const matchesRole =
+        auditRoleFilter === 'all' || log.actor_role === auditRoleFilter;
 
-    // Date Filter
-    let matchesDate = true;
-    if (auditStartDate) {
-      const logDate = new Date(log.created_at);
-      const start = new Date(auditStartDate);
-      start.setHours(0, 0, 0, 0);
-      matchesDate = matchesDate && logDate >= start;
-    }
-    if (auditEndDate) {
-      const logDate = new Date(log.created_at);
-      const end = new Date(auditEndDate);
-      end.setHours(23, 59, 59, 999);
-      matchesDate = matchesDate && logDate <= end;
-    }
+      // Date Filter
+      let matchesDate = true;
+      if (auditStartDate) {
+        const logDate = new Date(log.created_at);
+        const start = new Date(auditStartDate);
+        start.setHours(0, 0, 0, 0);
+        matchesDate = matchesDate && logDate >= start;
+      }
+      if (auditEndDate) {
+        const logDate = new Date(log.created_at);
+        const end = new Date(auditEndDate);
+        end.setHours(23, 59, 59, 999);
+        matchesDate = matchesDate && logDate <= end;
+      }
 
-    return matchesSearch && matchesRole && matchesDate;
-  });
+      return matchesSearch && matchesRole && matchesDate;
+    });
+  }, [displayLogs, auditSearchQuery, auditRoleFilter, auditStartDate, auditEndDate]);
 
-  // Calculate Metrics from REAL logs
-  const realStudentCount = auditLogs.filter(
-    (l) => l.actor_role === 'student' && l.action.toLowerCase().includes('success')
-  ).length;
-  const realFacultyCount = auditLogs.filter(
-    (l) => l.actor_role === 'faculty' && l.action.toLowerCase().includes('success')
-  ).length;
-  const realFailedCount = auditLogs.filter((l) =>
-    l.action.toLowerCase().includes('fail')
-  ).length;
+  // Calculate Metrics from REAL logs (memoized)
+  const metrics = useMemo(() => {
+    const studentCount = auditLogs.filter(
+      (l) => l.actor_role === 'student' && l.action.toLowerCase().includes('success')
+    ).length;
+    const facultyCount = auditLogs.filter(
+      (l) => l.actor_role === 'faculty' && l.action.toLowerCase().includes('success')
+    ).length;
+    const failedCount = auditLogs.filter((l) =>
+      l.action.toLowerCase().includes('fail')
+    ).length;
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const realActiveToday = new Set(
-    auditLogs
-      .filter((l) => (l.created_at || '').startsWith(todayStr))
-      .map((l) => l.actor_email)
-  ).size;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const activeToday = new Set(
+      auditLogs
+        .filter((l) => (l.created_at || '').startsWith(todayStr))
+        .map((l) => l.actor_email)
+    ).size;
 
-  const activeTodayVal = realActiveToday.toLocaleString();
-  const studentLoginsVal = realStudentCount.toLocaleString();
-  const facultyLoginsVal = realFacultyCount.toLocaleString();
-  const failedAttemptsVal = realFailedCount.toLocaleString();
+    return {
+      activeTodayVal: activeToday.toLocaleString(),
+      studentLoginsVal: studentCount.toLocaleString(),
+      facultyLoginsVal: facultyCount.toLocaleString(),
+      failedAttemptsVal: failedCount.toLocaleString(),
+    };
+  }, [auditLogs]);
 
-  // Pagination calculations
+  const { activeTodayVal, studentLoginsVal, facultyLoginsVal, failedAttemptsVal } = metrics;
+
+  // Pagination calculations (memoized)
   const itemsPerPage = 6;
-  const totalPages = Math.max(Math.ceil(filteredLogs.length / itemsPerPage), 1);
-  const paginatedLogs = filteredLogs.slice(
-    (auditCurrentPage - 1) * itemsPerPage,
-    auditCurrentPage * itemsPerPage
-  );
+  const totalPages = useMemo(() => {
+    return Math.max(Math.ceil(filteredLogs.length / itemsPerPage), 1);
+  }, [filteredLogs]);
+
+  const paginatedLogs = useMemo(() => {
+    return filteredLogs.slice(
+      (auditCurrentPage - 1) * itemsPerPage,
+      auditCurrentPage * itemsPerPage
+    );
+  }, [filteredLogs, auditCurrentPage]);
 
   // Helper Functions
   const getInitials = (email) => {
@@ -313,6 +328,15 @@ function AuditLogs() {
 
           {/* Upper Pagination controls */}
           <div className="flex items-center gap-3 ml-auto md:ml-0">
+            {/* Refresh button */}
+            <button
+              onClick={() => fetchAuditLogs(true)}
+              disabled={auditLoading}
+              title="Force Refresh Logs"
+              className="p-1.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 rounded-lg cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            >
+              <RefreshCw size={14} className={auditLoading ? 'animate-spin' : ''} />
+            </button>
             <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
               Page {auditCurrentPage} of {totalPages}
             </span>

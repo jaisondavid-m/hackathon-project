@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, Outlet, useOutletContext, useLocation } from 'react-router-dom';
 import { authService } from '../api/auth';
 import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import Login from '../pages/common/Login';
-import AdminDashboard from '../pages/admin/AdminDashboard';
 import UserManagement from '../pages/admin/UserManagement';
 import ConfigManagement from '../pages/admin/ConfigManagement';
 import AuditLogs from '../pages/admin/AuditLogs';
@@ -27,19 +27,59 @@ function ProtectedRoute({ user, allowedRole }) {
     return <Navigate to="/login" replace />;
   }
   
-  return <Outlet />;
+  return <Outlet context={useOutletContext()} />;
 }
 
-function AuthenticatedLayout({ user, onLogout }) {
+function DashboardLayout({ user, onLogout }) {
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  // Page label mapping for breadcrumbs
+  const getTabLabel = () => {
+    const path = location.pathname;
+    if (path.includes('/admin/users')) return 'Users Management';
+    if (path.includes('/admin/config')) return 'Configuration';
+    if (path.includes('/admin/audit-logs')) return 'Audit Logs';
+    if (path.includes('/faculty/otp')) return 'OTP & QR Code';
+    if (path.includes('/faculty/manual')) return 'Manual Sheet';
+    if (path.includes('/student/otp')) return 'Mark Attendance';
+    if (path.includes('/student/history')) return 'Attendance History';
+    return 'Dashboard';
+  };
+
   return (
-    <div className="min-h-screen bg-[#EEF1F9] flex flex-col">
-      <Navbar user={user} onLogout={onLogout} />
-      <main className="flex-grow">
-        <Outlet />
-      </main>
-      <footer className="py-6 border-t border-slate-100/50 bg-white text-center text-xs text-slate-400 font-semibold tracking-wider uppercase">
-        &copy; {new Date().getFullYear()} PCDP Attendance System &bull; All Rights Reserved
-      </footer>
+    <div className="min-h-screen bg-[#EEF1F9] flex">
+      {/* Role-based Left Sidebar */}
+      <Sidebar 
+        user={user} 
+        mobileOpen={mobileSidebarOpen} 
+        onCloseMobile={() => setMobileSidebarOpen(false)} 
+      />
+
+      {/* Main Right Content Section */}
+      <div className="flex-grow flex flex-col min-h-screen">
+        {/* Horizontal Action Header */}
+        <Navbar 
+          user={user} 
+          onLogout={onLogout} 
+          toggleMobileSidebar={() => setMobileSidebarOpen(true)} 
+        />
+
+        {/* Content View wrap */}
+        <div className="flex-grow p-4 sm:p-8 flex flex-col">
+          {/* Breadcrumb Path trail */}
+          <div className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 leading-none select-none">
+            <span>PCDP v4.0</span>
+            <span>&rsaquo;</span>
+            <span className="text-[#7D53F6]">{getTabLabel()}</span>
+          </div>
+
+          {/* Wrapper white card container */}
+          <main className="bg-white rounded-[32px] border border-slate-100/80 shadow-md p-6 sm:p-8 flex-grow">
+            <Outlet context={{ user, onLogout }} />
+          </main>
+        </div>
+      </div>
     </div>
   );
 }
@@ -125,17 +165,19 @@ function App() {
       {/* Home Route */}
       <Route path="/home" element={<Home />} />
 
-      {/* Protected dashboard routes with shared navbar layout */}
-      <Route element={<AuthenticatedLayout user={user} onLogout={handleLogout} />}>
+      {/* Protected routes under the unified DashboardLayout */}
+      <Route element={<DashboardLayout user={user} onLogout={handleLogout} />}>
+        {/* Admin routes */}
         <Route element={<ProtectedRoute user={user} allowedRole="admin" />}>
-          <Route path="/admin" element={<AdminDashboard />}>
+          <Route path="/admin">
             <Route index element={<Navigate to="users" replace />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="config" element={<ConfigManagement />} />
             <Route path="audit-logs" element={<AuditLogs />} />
           </Route>
         </Route>
-        
+
+        {/* Faculty routes */}
         <Route element={<ProtectedRoute user={user} allowedRole="faculty" />}>
           <Route path="/faculty" element={<FacultyDashboard />}>
             <Route index element={<Navigate to="otp" replace />} />
@@ -144,6 +186,7 @@ function App() {
           </Route>
         </Route>
         
+        {/* Student routes */}
         <Route element={<ProtectedRoute user={user} allowedRole="student" />}>
           <Route path="/student" element={<StudentDashboard user={user} />}>
             <Route index element={<Navigate to="otp" replace />} />

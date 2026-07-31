@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, LogIn, AlertCircle, Shield, User, Eye, EyeOff } from 'lucide-react';
+import { Lock, LogIn, AlertCircle, User, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../../api/auth';
 
 function Login({ onLoginSuccess }) {
@@ -66,9 +66,7 @@ function Login({ onLoginSuccess }) {
           
           {/* Logo & Branding */}
           <div className="flex items-center gap-3 mb-5">
-            <div className="bg-[#7D53F6] text-white p-2.5 rounded-[14px] shadow-lg shadow-[#7D53F6]/20">
-              <Shield className="w-6 h-6 fill-white/10 stroke-[2.5]" />
-            </div>
+            <img src="/logo.png" alt="PCDP Logo" className="h-10 w-auto flex-shrink-0" />
             <div>
               <div className="text-xl font-extrabold text-[#7D53F6] tracking-tight leading-none">
                 PCDP 4.0

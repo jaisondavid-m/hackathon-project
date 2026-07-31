@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Clock, AlertCircle, CheckCircle, Save, Layers, ChevronLeft, ChevronRight, Calendar, Info 
 } from 'lucide-react';
@@ -46,26 +46,18 @@ function ConfigManagement() {
   const fetchConfigs = async () => {
     try {
       setHoursLoading(true);
-      const hoursData = await configService.getHourConfigs();
+      const [hoursData, holidaysData, venuesData] = await Promise.all([
+        configService.getHourConfigs(),
+        configService.getHolidays().catch(err => { console.error('Failed to load holidays:', err); return []; }),
+        venueService.getVenues().catch(err => { console.error('Failed to load venues:', err); return []; })
+      ]);
       setHours(hoursData);
-    } catch (err) {
-      setHoursError('Failed to load hour configurations.');
-    } finally {
-      setHoursLoading(false);
-    }
-
-    try {
-      const holidaysData = await configService.getHolidays();
       setHolidays(holidaysData);
-    } catch (err) {
-      console.error('Failed to load holidays:', err);
-    }
-
-    try {
-      const venuesData = await venueService.getVenues();
       setVenues(venuesData);
     } catch (err) {
-      console.error('Failed to load venues:', err);
+      setHoursError('Failed to load configurations.');
+    } finally {
+      setHoursLoading(false);
     }
   };
 
@@ -250,11 +242,11 @@ function ConfigManagement() {
     }
   };
 
-  // Render Calendar Month Grid
-  const daysInMonth = getDaysInMonth(currentMonthDate);
-  const firstDayIndex = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth(), 1).getDay();
-  const emptyDaysBefore = Array.from({ length: firstDayIndex });
-  const monthName = currentMonthDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+  // Render Calendar Month Grid (memoized)
+  const daysInMonth = useMemo(() => getDaysInMonth(currentMonthDate), [currentMonthDate]);
+  const firstDayIndex = useMemo(() => new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth(), 1).getDay(), [currentMonthDate]);
+  const emptyDaysBefore = useMemo(() => Array.from({ length: firstDayIndex }), [firstDayIndex]);
+  const monthName = useMemo(() => currentMonthDate.toLocaleString('default', { month: 'long', year: 'numeric' }), [currentMonthDate]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fadeIn">
