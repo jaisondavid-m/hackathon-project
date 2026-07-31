@@ -30,6 +30,7 @@ func main() {
 	configController := controllers.NewConfigController(db)
 	attendanceController := controllers.NewAttendanceController(db)
 	venueController := controllers.NewVenueController(db)
+	auditController := controllers.NewAuditController(db)
 
 	// Set up router
 	r := gin.Default()
@@ -86,6 +87,7 @@ func main() {
 			adminOnly.POST("/hours", configController.SaveHourConfigs)
 			adminOnly.POST("/holidays", configController.SaveHoliday)
 			adminOnly.POST("/venues", venueController.CreateVenue)
+			adminOnly.GET("/audit-logs", auditController.GetAuditLogs)
 		}
 	}
 

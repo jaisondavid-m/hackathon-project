@@ -9,7 +9,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add authorization token
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('pcdp_token');

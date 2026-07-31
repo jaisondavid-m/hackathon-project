@@ -41,6 +41,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 	err := ac.DB.Where("emailid = ?", req.EmailID).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			database.LogActivity(req.EmailID, "unknown", "Login Failed", "Email ID not found", c.ClientIP())
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email id or password"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
@@ -51,6 +52,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 	// Verify password hash
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
+		database.LogActivity(user.EmailID, user.Role, "Login Failed", "Invalid password attempt", c.ClientIP())
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email id or password"})
 		return
 	}
