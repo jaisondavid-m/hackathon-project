@@ -48,7 +48,7 @@ func InitDB(dsn string) (*gorm.DB, error) {
 	log.Println("Database connection established successfully")
 
 	// Run migrations
-	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{})
+	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{}, &models.AttendanceSession{}, &models.AttendanceRecord{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to auto-migrate database: %w", err)
 	}

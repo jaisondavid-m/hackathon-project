@@ -28,6 +28,7 @@ func main() {
 	// Initialize Controllers
 	authController := controllers.NewAuthController(db, cfg)
 	configController := controllers.NewConfigController(db)
+	attendanceController := controllers.NewAttendanceController(db)
 
 	// Set up router
 	r := gin.Default()
@@ -57,6 +58,23 @@ func main() {
 		protected.GET("/profile", authController.GetProfile)
 		protected.GET("/hours", configController.GetHourConfigs)
 		protected.GET("/holidays", configController.GetHolidays)
+
+		// Faculty & Admin Routes
+		facultyOnly := protected.Group("/")
+		facultyOnly.Use(middleware.RequireRole(models.RoleFaculty, models.RoleAdmin))
+		{
+			facultyOnly.POST("/faculty/sessions", attendanceController.StartAttendanceSession)
+			facultyOnly.GET("/faculty/sessions", attendanceController.GetActiveSessions)
+			facultyOnly.GET("/faculty/attendance/logs", attendanceController.GetClassAttendanceLogs)
+		}
+
+		// Student Routes
+		studentOnly := protected.Group("/")
+		studentOnly.Use(middleware.RequireRole(models.RoleStudent))
+		{
+			studentOnly.POST("/student/attendance/submit", attendanceController.SubmitOTP)
+			studentOnly.GET("/student/attendance/records", attendanceController.GetStudentRecords)
+		}
 
 		// Admin-Only Routes
 		adminOnly := protected.Group("/admin")
