@@ -1,14 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LogOut, User, ShieldAlert, Award, GraduationCap } from 'lucide-react';
 import { authService } from '../api/auth';
 
 function Navbar({ user, onLogout }) {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     authService.logout();
     if (onLogout) {
       onLogout();
     } else {
-      window.location.reload();
+      navigate('/login');
     }
   };
 

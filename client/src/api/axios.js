@@ -32,8 +32,8 @@ api.interceptors.response.use(
       localStorage.removeItem('pcdp_token');
       localStorage.removeItem('pcdp_user');
       // If we are not already on the login page or we want a clean state:
-      if (window.location.pathname !== '/') {
-        window.location.href = '/';
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);
