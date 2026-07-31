@@ -79,11 +79,10 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
             <button
               key={item.id}
               onClick={() => handleNavClick(item.path)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-0 ${
-                isActive
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-0 ${isActive
                   ? 'bg-[#7D53F6] text-white font-bold shadow-md shadow-[#7D53F6]/25'
                   : 'text-slate-500 hover:bg-slate-50/50 hover:text-slate-800'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-3">
                 <Icon size={18} className={isActive ? 'text-white' : 'text-slate-400'} />
@@ -117,7 +116,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
                 <img src="/logo.png" alt="PCDP Logo" className="h-7 w-auto flex-shrink-0" />
                 <span className="font-black text-slate-800 text-lg">PCDP v4.0</span>
               </div>
-              <button 
+              <button
                 onClick={onCloseMobile}
                 className="text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-none"
               >

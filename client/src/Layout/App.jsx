@@ -23,14 +23,14 @@ function ProtectedRoute({ user, allowedRole }) {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  
+
   if (user.role !== allowedRole) {
     if (user.role === 'admin') return <Navigate to="/admin" replace />;
     if (user.role === 'faculty') return <Navigate to="/faculty" replace />;
     if (user.role === 'student') return <Navigate to="/student" replace />;
     return <Navigate to="/login" replace />;
   }
-  
+
   return <Outlet context={useOutletContext()} />;
 }
 
@@ -58,19 +58,19 @@ function DashboardLayout({ user, onLogout }) {
   return (
     <div className="min-h-screen bg-[#EEF1F9] flex">
       {/* Role-based Left Sidebar */}
-      <Sidebar 
-        user={user} 
-        mobileOpen={mobileSidebarOpen} 
-        onCloseMobile={() => setMobileSidebarOpen(false)} 
+      <Sidebar
+        user={user}
+        mobileOpen={mobileSidebarOpen}
+        onCloseMobile={() => setMobileSidebarOpen(false)}
       />
 
       {/* Main Right Content Section */}
       <div className="flex-grow flex flex-col min-h-screen">
         {/* Horizontal Action Header */}
-        <Navbar 
-          user={user} 
-          onLogout={onLogout} 
-          toggleMobileSidebar={() => setMobileSidebarOpen(true)} 
+        <Navbar
+          user={user}
+          onLogout={onLogout}
+          toggleMobileSidebar={() => setMobileSidebarOpen(true)}
         />
 
         {/* Content View wrap */}
@@ -191,7 +191,7 @@ function App() {
             <Route path="my-attendance" element={<FacultyAttendance />} />
           </Route>
         </Route>
-        
+
         {/* Student routes */}
         <Route element={<ProtectedRoute user={user} allowedRole="student" />}>
           <Route path="/student" element={<StudentDashboard user={user} />}>
