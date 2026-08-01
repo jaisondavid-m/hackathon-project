@@ -123,6 +123,8 @@ The Student console offers quick and secure attendance marking:
 
 > The relational schema powering the system — covering users, venues, geofences, sessions, attendance records, and audit logs.
 
+refer: https://dbdiagram.io/d/6a6c3f0bc3a90dd98df5c553
+
 ![Database Entity-Relationship Diagram](docs/images/dbdiagram.png)
 
 ---
