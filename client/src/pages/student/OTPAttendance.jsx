@@ -486,7 +486,12 @@ function OTPAttendance() {
               <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight mt-1">
                 Verified Successfully
               </h2>
-              <p className="text-slate-500 font-bold text-xs sm:text-sm uppercase tracking-wider">
+              {submitSuccess && (
+                <p className="text-emerald-600 font-semibold text-sm max-w-xs mx-auto leading-normal">
+                  {submitSuccess}
+                </p>
+              )}
+              <p className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">
                 Redirecting to dashboard...
               </p>
             </motion.div>
