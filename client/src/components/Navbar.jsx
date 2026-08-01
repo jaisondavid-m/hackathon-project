@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, ChevronDown, LogOut, Menu, User } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 
 function Navbar({ user, onLogout, toggleMobileSidebar }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   if (!user) return null;
 
@@ -74,55 +73,24 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
           <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#7D53F6] rounded-full border border-white" />
         </div>
 
-        {/* Profile Card Dropdown */}
-        <div className="relative">
-          <button 
-            onClick={() => setProfileDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-2 sm:gap-3 bg-[#EEF1F9]/50 hover:bg-[#EEF1F9] border border-slate-100 px-3 py-1.5 rounded-2xl cursor-pointer transition-all duration-150"
-          >
-            {/* Avatar Circle */}
-            <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center font-extrabold text-xs text-[#7D53F6] border border-slate-100 flex-shrink-0">
-              {getInitials(user?.name)}
-            </div>
-            <div className="text-left hidden sm:block">
-              <span className="font-bold text-slate-700 text-sm block leading-tight">
-                {user?.name || 'User'}
-              </span>
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5 leading-none">
-                {getRoleLabel(user.role)}
-              </span>
-            </div>
-            <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {profileDropdownOpen && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
-              <div className="absolute right-0 mt-2 w-52 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn">
-                <button
-                  onClick={() => {
-                    setProfileDropdownOpen(false);
-                    navigate(`/${user.role}/profile`);
-                  }}
-                  className="w-full text-left px-4 py-2.5 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer border-b border-slate-100"
-                >
-                  <User size={16} className="text-[#7D53F6]" />
-                  <span>View Profile</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setProfileDropdownOpen(false);
-                    onLogout();
-                  }}
-                  className="w-full text-left px-4 py-2.5 hover:bg-rose-50 text-rose-600 font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
-                >
-                  <LogOut size={16} />
-                  <span>Logout Session</span>
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+        {/* Profile Card */}
+        <button
+          onClick={() => navigate(`/${user.role}/profile`)}
+          className="flex items-center gap-2 sm:gap-3 bg-[#EEF1F9]/50 hover:bg-[#EEF1F9] border border-slate-100 px-3 py-1.5 rounded-2xl cursor-pointer transition-all duration-150 text-left focus:outline-none"
+        >
+          {/* Avatar Circle */}
+          <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center font-extrabold text-xs text-[#7D53F6] border border-slate-100 flex-shrink-0">
+            {getInitials(user?.name)}
+          </div>
+          <div className="text-left hidden sm:block">
+            <span className="font-bold text-slate-700 text-sm block leading-tight">
+              {user?.name || 'User'}
+            </span>
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5 leading-none">
+              {getRoleLabel(user.role)}
+            </span>
+          </div>
+        </button>
       </div>
     </header>
   );

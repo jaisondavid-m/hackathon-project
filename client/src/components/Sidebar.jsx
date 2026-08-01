@@ -1,8 +1,8 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock, ClipboardList, UserCheck, User } from 'lucide-react';
+import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock, ClipboardList, UserCheck, User, LogOut } from 'lucide-react';
 
-function Sidebar({ user, mobileOpen, onCloseMobile }) {
+function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -101,8 +101,22 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
         })}
       </nav>
 
+      {/* Logout Session Button */}
+      <div className="px-3 py-2 border-t border-slate-100/50 flex-shrink-0">
+        <button
+          onClick={() => {
+            if (onCloseMobile) onCloseMobile();
+            onLogout();
+          }}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors duration-200 cursor-pointer focus:outline-none"
+        >
+          <LogOut size={18} className="text-rose-400" />
+          <span className="text-sm font-semibold tracking-wide">Logout Session</span>
+        </button>
+      </div>
+
       {/* Footer info */}
-      <div className="p-6 border-t border-slate-100/50 text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center flex-shrink-0">
+      <div className="p-4 text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center flex-shrink-0">
         &copy; {new Date().getFullYear()} PCDP Attendance
       </div>
     </div>

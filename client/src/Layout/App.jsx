@@ -65,6 +65,7 @@ function DashboardLayout({ user, onLogout }) {
         user={user}
         mobileOpen={mobileSidebarOpen}
         onCloseMobile={() => setMobileSidebarOpen(false)}
+        onLogout={onLogout}
       />
 
       {/* Main Right Content Section */}
