@@ -14,12 +14,12 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p", "jaison_db_password"]
-      interval: 5s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -pjaison_db_password --silent || exit 1"]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
-  # 2. Go API Backend Container
   backend:
     build:
       context: ./server
