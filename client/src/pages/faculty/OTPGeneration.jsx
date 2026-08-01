@@ -481,60 +481,64 @@ function OTPGeneration() {
                       <img
                         src={
                           activeSession
-                            ? `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${activeSession.otp}&color=000000`
+                            ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${activeSession.otp}&color=000000`
                             : `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=preview&color=000000`
                         }
                         alt="Attendance QR Code"
-                        className={`w-22 h-22 object-contain ${!activeSession ? 'opacity-30' : ''}`}
+                        className={`object-contain transition-all duration-200 ${
+                          activeSession ? 'w-36 h-36' : 'w-22 h-22 opacity-30'
+                        }`}
                       />
                     </div>
 
-                    {/* Metadata Table */}
-                    <div className="w-full max-w-[200px] space-y-2.5 text-[11px] pt-1.5 flex-shrink-0">
-                      {/* Subject */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
-                          <BookOpen size={10} className="text-[#7D53F6]" />
-                          Subject
-                        </span>
-                        <span className="font-extrabold text-slate-700 truncate max-w-[125px]">
-                          {resolveSubjectName()}
-                        </span>
-                      </div>
+                    {/* Metadata Table (Only shown before generation) */}
+                    {!activeSession && (
+                      <div className="w-full max-w-[200px] space-y-2.5 text-[11px] pt-1.5 flex-shrink-0">
+                        {/* Subject */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
+                            <BookOpen size={10} className="text-[#7D53F6]" />
+                            Subject
+                          </span>
+                          <span className="font-extrabold text-slate-700 truncate max-w-[125px]">
+                            {resolveSubjectName()}
+                          </span>
+                        </div>
 
-                      {/* Date */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
-                          <Calendar size={10} className="text-[#7D53F6]" />
-                          Date
-                        </span>
-                        <span className="font-extrabold text-slate-700">
-                          {resolveDisplayDate()}
-                        </span>
-                      </div>
+                        {/* Date */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
+                            <Calendar size={10} className="text-[#7D53F6]" />
+                            Date
+                          </span>
+                          <span className="font-extrabold text-slate-700">
+                            {resolveDisplayDate()}
+                          </span>
+                        </div>
 
-                      {/* Hour (Period) */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
-                          <Clock size={10} className="text-[#7D53F6]" />
-                          Hour
-                        </span>
-                        <span className="font-extrabold text-slate-700 text-right">
-                          H{selectedHour}
-                        </span>
-                      </div>
+                        {/* Hour (Period) */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
+                            <Clock size={10} className="text-[#7D53F6]" />
+                            Hour
+                          </span>
+                          <span className="font-extrabold text-slate-700 text-right">
+                            H{selectedHour}
+                          </span>
+                        </div>
 
-                      {/* Session ID */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
-                          <Key size={10} className="text-[#7D53F6]" />
-                          Session ID
-                        </span>
-                        <span className="font-extrabold text-slate-700 font-mono tracking-tighter text-[9px] uppercase">
-                          {resolveSessionId()}
-                        </span>
+                        {/* Session ID */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
+                            <Key size={10} className="text-[#7D53F6]" />
+                            Session ID
+                          </span>
+                          <span className="font-extrabold text-slate-700 font-mono tracking-tighter text-[9px] uppercase">
+                            {resolveSessionId()}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
