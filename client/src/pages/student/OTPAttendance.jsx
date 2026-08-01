@@ -505,10 +505,10 @@ function OTPAttendance() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden border border-[#E5E7EB]"
+              className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden border border-[#E5E7EB] flex flex-col max-h-[90vh]"
             >
               {/* Modal Header */}
-              <div className="h-14 px-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <div className="h-14 px-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 flex-shrink-0">
                 <h3 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
                   <QrCode size={16} className="text-[#4F46E5]" />
                   Scan Attendance QR Code
@@ -525,7 +525,7 @@ function OTPAttendance() {
               </div>
 
               {/* Modal Body */}
-              <div className="p-5 flex flex-col items-center space-y-5">
+              <div className="p-5 flex flex-col items-center space-y-5 overflow-y-auto flex-grow">
                 <div className="w-56 h-56 bg-slate-950 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border-4 border-slate-800 shadow-inner">
                   {scanStatus === 'scanning' ? (
                     <>

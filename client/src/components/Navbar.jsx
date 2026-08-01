@@ -126,9 +126,9 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
       {/* Notifications Modal */}
       {showNotifications && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] shadow-2xl max-w-md w-full border border-slate-100/85 overflow-hidden animate-fadeIn">
+          <div className="bg-white rounded-[24px] shadow-2xl max-w-md w-full border border-slate-100/85 overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]">
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 flex-shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className={`w-2.5 h-2.5 rounded-full ${
                   getNotificationContent().type === 'warning' ? 'bg-amber-500' :
@@ -147,7 +147,7 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
             </div>
             
             {/* Modal Body */}
-            <div className="p-6">
+            <div className="p-6 overflow-y-auto flex-grow">
               <div className={`p-4 rounded-2xl border ${
                 getNotificationContent().type === 'warning' ? 'bg-amber-50/30 border-amber-100 text-amber-900' :
                 getNotificationContent().type === 'info' ? 'bg-blue-50/30 border-blue-100 text-blue-900' : 
