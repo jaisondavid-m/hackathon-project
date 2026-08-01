@@ -42,7 +42,45 @@ type Point struct {
 	Lon float64
 }
 
-// Ray-casting algorithm to verify if student coordinates are inside the venue box
+// Converts lat/lon to flat-space meters relative to some latitude reference.
+func latLonToMeters(lat, lon, refLat float64) (x, y float64) {
+	const metersPerDegree = 111139.0
+	rad := refLat * math.Pi / 180.0
+	cosRef := math.Cos(rad)
+
+	y = lat * metersPerDegree
+	x = lon * metersPerDegree * cosRef
+	return x, y
+}
+
+// Calculates the shortest distance in meters from point P(px, py) to segment AB.
+func distanceToSegment(px, py, ax, ay, bx, by float64) float64 {
+	dx := bx - ax
+	dy := by - ay
+
+	l2 := dx*dx + dy*dy
+	if l2 == 0 {
+		pdx := px - ax
+		pdy := py - ay
+		return math.Sqrt(pdx*pdx + pdy*pdy)
+	}
+
+	t := ((px-ax)*dx + (py-ay)*dy) / l2
+	if t < 0 {
+		t = 0
+	} else if t > 1 {
+		t = 1
+	}
+
+	nx := ax + t*dx
+	ny := ay + t*dy
+
+	pdx := px - nx
+	pdy := py - ny
+	return math.Sqrt(pdx*pdx + pdy*pdy)
+}
+
+// Ray-casting algorithm to verify if student coordinates are inside or within 20m of the venue box
 func isPointInQuadrilateral(lat, lon float64, v models.Venue) bool {
 	vertices := []Point{
 		{v.Lat1, v.Lon1},
@@ -59,7 +97,34 @@ func isPointInQuadrilateral(lat, lon float64, v models.Venue) bool {
 		}
 		j = i
 	}
-	return inside
+	if inside {
+		return true
+	}
+
+	// Calculate if point is within 20 meters buffer from any of the boundary segments
+	refLat := lat
+	px, py := latLonToMeters(lat, lon, refLat)
+
+	p1x, p1y := latLonToMeters(v.Lat1, v.Lon1, refLat)
+	p2x, p2y := latLonToMeters(v.Lat2, v.Lon2, refLat)
+	p3x, p3y := latLonToMeters(v.Lat3, v.Lon3, refLat)
+	p4x, p4y := latLonToMeters(v.Lat4, v.Lon4, refLat)
+
+	segments := [][4]float64{
+		{p1x, p1y, p2x, p2y},
+		{p2x, p2y, p3x, p3y},
+		{p3x, p3y, p4x, p4y},
+		{p4x, p4y, p1x, p1y},
+	}
+
+	for _, seg := range segments {
+		d := distanceToSegment(px, py, seg[0], seg[1], seg[2], seg[3])
+		if d <= 20.0 {
+			return true
+		}
+	}
+
+	return false
 }
 
 // StartAttendanceSession initiates a new OTP session linked to a venue (Faculty only)
