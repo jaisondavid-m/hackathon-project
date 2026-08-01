@@ -300,33 +300,33 @@ function OTPGeneration() {
   };
 
   const selectedHourConfig = hours.find(h => h.hour_number === selectedHour);
-  const displayOTP = activeSession ? activeSession.otp : '472913';
-  const otpDigits = displayOTP.split('');
+  const displayOTP = activeSession ? activeSession.otp : '';
+  const otpDigits = displayOTP ? displayOTP.split('') : ['', '', '', '', '', ''];
 
   const filteredHours = todayOverride && todayOverride.is_half_day
     ? hours.filter(h => h.hour_number <= 4)
     : hours;
 
   return (
-    <div className="w-full flex-grow flex flex-col animate-fadeIn">
+    <div className="w-full flex-grow flex flex-col justify-between overflow-hidden">
       {/* 2-Column Responsive Layout - Split when session is active to display live scan records */}
-      <div className={`grid grid-cols-1 ${activeSession ? 'xl:grid-cols-12' : 'w-full'} gap-8 items-start flex-grow`}>
+      <div className={`grid grid-cols-1 ${activeSession ? 'xl:grid-cols-12' : 'w-full'} gap-5 items-stretch flex-grow`}>
         
         {/* Left Column: Form & Mockup Preview boxes */}
-        <div className={`${activeSession ? 'xl:col-span-7' : 'w-full'} space-y-8`}>
+        <div className={`${activeSession ? 'xl:col-span-7' : 'w-full'} flex flex-col justify-between space-y-4`}>
           
           {/* Section 1: Hour Selector */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#7D53F6] text-white flex items-center justify-center font-extrabold text-sm shadow-xs select-none">
+              <div className="w-6 h-6 rounded-full bg-[#7D53F6] text-white flex items-center justify-center font-extrabold text-xs shadow-xs select-none">
                 1
               </div>
-              <h3 className="font-extrabold text-base text-slate-800 tracking-tight">
+              <h3 className="font-extrabold text-sm text-slate-800 tracking-tight">
                 Select Current Hour (Period)
               </h3>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2.5">
               {filteredHours.map((hr) => {
                 const isSelected = selectedHour === hr.hour_number;
                 const status = getHourStatus(hr.start_time, hr.end_time);
@@ -339,37 +339,37 @@ function OTPGeneration() {
                     type="button"
                     disabled={!!activeSession}
                     onClick={() => setSelectedHour(hr.hour_number)}
-                    className={`relative flex flex-col items-center justify-between pt-5 pb-0 rounded-2xl border transition-all duration-200 overflow-hidden bg-white group ${
+                    className={`relative flex flex-col items-center justify-between pt-3 pb-0 rounded-xl border transition-all duration-200 overflow-hidden bg-white group ${
                       isSelected
-                        ? 'border-[#7D53F6] ring-1 ring-[#7D53F6]/20'
-                        : 'border-slate-200/80 hover:border-slate-300'
+                        ? 'border-[#7D53F6] ring-1 ring-[#7D53F6]/10'
+                        : 'border-slate-200/60 hover:border-slate-300'
                     } ${activeSession ? 'opacity-65 cursor-not-allowed' : 'cursor-pointer'}`}
-                    style={{ minHeight: '130px' }}
+                    style={{ minHeight: '105px' }}
                   >
                     {/* Checkbox indicator */}
-                    <div className="absolute top-2.5 right-2.5">
+                    <div className="absolute top-2 right-2">
                       {isSelected ? (
-                        <div className="w-5 h-5 rounded-full bg-[#7D53F6] flex items-center justify-center text-white">
-                          <Check size={11} strokeWidth={3.5} />
+                        <div className="w-4 h-4 rounded-full bg-[#7D53F6] flex items-center justify-center text-white">
+                          <Check size={9} strokeWidth={4} />
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full border border-slate-200/90 bg-slate-50/50" />
+                        <div className="w-4 h-4 rounded-full border border-slate-200/80 bg-slate-50/50" />
                       )}
                     </div>
 
-                    <span className="font-extrabold text-xs text-slate-800">
+                    <span className="font-extrabold text-[11px] text-slate-800">
                       H{hr.hour_number}
                     </span>
 
-                    <div className={`my-1.5 p-1 rounded-full ${isSelected ? 'text-[#7D53F6]' : 'text-slate-400 group-hover:text-slate-500'}`}>
-                      <Clock size={15} />
+                    <div className={`my-1 text-slate-400 ${isSelected ? 'text-[#7D53F6]' : 'group-hover:text-slate-500'}`}>
+                      <Clock size={13} />
                     </div>
 
-                    <span className="text-[9px] font-bold text-slate-500 px-1 text-center mb-3">
-                      {hr.start_time} - {hr.end_time}
+                    <span className="text-[8px] font-bold text-slate-500 px-0.5 text-center mb-2">
+                      {hr.start_time.replace(':00', '')} - {hr.end_time.replace(':00', '')}
                     </span>
 
-                    <div className={`w-full py-1.5 text-center text-[9px] font-extrabold uppercase tracking-wider ${
+                    <div className={`w-full py-1 text-center text-[8px] font-extrabold uppercase tracking-wider ${
                       isSelected
                         ? 'bg-[#7D53F6] text-white'
                         : 'bg-slate-50 text-slate-400 border-t border-slate-100'
@@ -382,29 +382,16 @@ function OTPGeneration() {
             </div>
           </div>
 
-          {/* Info Warning banner */}
-          <div className="p-4 bg-[#7D53F6]/5 border border-[#7D53F6]/10 rounded-2xl flex items-start gap-3 text-xs leading-relaxed">
-            <div className="p-1 bg-[#7D53F6]/10 rounded-lg text-[#7D53F6] flex-shrink-0 mt-0.5">
-              <AlertCircle size={15} />
-            </div>
-            <div>
-              <h5 className="font-bold text-slate-800 mb-0.5">How it works?</h5>
-              <p className="text-slate-500 font-semibold leading-relaxed">
-                Clicking generate starts a 5-minute session and outputs a 6-digit OTP code and a scannable QR code. Students can enter the OTP code or scan the QR code on their dashboard to mark themselves present.
-              </p>
-            </div>
-          </div>
-
           {otpError && (
-            <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 text-xs font-bold flex items-center gap-2 animate-fadeIn">
-              <AlertCircle size={16} className="flex-shrink-0" />
+            <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-xs font-bold flex items-center gap-2 animate-fadeIn">
+              <AlertCircle size={14} className="flex-shrink-0" />
               <span>{otpError}</span>
             </div>
           )}
 
           {todayOverride && todayOverride.is_half_day && (
-            <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-3 text-amber-700 text-xs font-semibold">
-              <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+            <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-2.5 text-amber-700 text-xs font-semibold">
+              <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
               <div>
                 <strong>Half Day Notice:</strong> Today is configured as a Half Day ({todayOverride.name}). Only hours H1 to H4 are active.
               </div>
@@ -412,40 +399,40 @@ function OTPGeneration() {
           )}
 
           {/* Section 2: Preview Area */}
-          <div className="space-y-4">
+          <div className="space-y-2 flex-grow flex flex-col justify-center">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#7D53F6] text-white flex items-center justify-center font-extrabold text-sm shadow-xs select-none">
+              <div className="w-6 h-6 rounded-full bg-[#7D53F6] text-white flex items-center justify-center font-extrabold text-xs shadow-xs select-none">
                 2
               </div>
-              <h3 className="font-extrabold text-base text-slate-800 tracking-tight">
+              <h3 className="font-extrabold text-sm text-slate-800 tracking-tight">
                 Preview (After Generation)
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Left card: OTP code display */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs flex flex-col justify-between">
+              <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-3 pb-4 border-b border-slate-50">
-                    <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl">
-                      <ShieldCheck size={18} />
+                  <div className="flex items-center gap-2.5 pb-3 border-b border-slate-50">
+                    <div className="p-1.5 bg-[#7D53F6]/10 text-[#7D53F6] rounded-lg">
+                      <ShieldCheck size={16} />
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-slate-800">OTP Code</h4>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                      <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
                         Share this code with students
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center gap-2.5 my-7">
+                  <div className="flex justify-between items-center gap-2 my-5">
                     {otpDigits.map((digit, i) => (
                       <div
                         key={i}
-                        className={`flex-grow aspect-[3/4] max-w-[50px] rounded-2xl border flex items-center justify-center font-extrabold text-2xl transition-all duration-200 ${
+                        className={`flex-grow aspect-[3/4] max-w-[45px] rounded-xl border flex items-center justify-center font-extrabold text-xl transition-all duration-200 ${
                           activeSession
                             ? 'border-[#7D53F6]/30 bg-[#7D53F6]/5 text-[#7D53F6]'
-                            : 'border-slate-200 bg-slate-50/50 text-slate-400'
+                            : 'border-slate-100 bg-slate-50/20 text-slate-300'
                         }`}
                       >
                         {digit}
@@ -454,39 +441,39 @@ function OTPGeneration() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 pt-4 border-t border-slate-50">
-                  <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md ${
+                <div className="flex items-center gap-2 text-[9px] font-bold text-slate-500 pt-3 border-t border-slate-50">
+                  <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${
                     activeSession ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-400'
                   }`}>
-                    <Clock size={12} className={activeSession ? 'animate-pulse' : ''} />
+                    <Clock size={10} className={activeSession ? 'animate-pulse' : ''} />
                     <span>Valid for {activeSession ? formatTime(timeLeft) : '05:00'}</span>
                   </div>
                   <span className="text-slate-200">|</span>
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <Calendar size={12} />
+                  <div className="flex items-center gap-1 text-slate-400">
+                    <Calendar size={10} />
                     <span>Generated at {activeSession ? new Date(activeSession.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '10:30:45 AM'}</span>
                   </div>
                 </div>
               </div>
 
               {/* Right card: QR Code & details */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs flex flex-col justify-between">
+              <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-3 pb-4 border-b border-slate-50">
-                    <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl">
-                      <QrCode size={18} />
+                  <div className="flex items-center gap-2.5 pb-3 border-b border-slate-50">
+                    <div className="p-1.5 bg-[#7D53F6]/10 text-[#7D53F6] rounded-lg">
+                      <QrCode size={16} />
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-slate-800">QR Code</h4>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                      <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
                         Students can scan this code
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 my-5">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 my-3">
                     {/* QR Code Container */}
-                    <div className={`p-2 rounded-2xl border transition-all duration-200 flex-shrink-0 bg-white ${
+                    <div className={`p-1.5 rounded-xl border transition-all duration-200 flex-shrink-0 bg-white ${
                       activeSession ? 'border-[#7D53F6]/20' : 'border-slate-100'
                     }`}>
                       <img
@@ -496,27 +483,27 @@ function OTPGeneration() {
                             : `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=preview&color=cbd5e1`
                         }
                         alt="Attendance QR Code"
-                        className={`w-24 h-24 object-contain ${!activeSession ? 'opacity-50' : ''}`}
+                        className={`w-20 h-20 object-contain ${!activeSession ? 'opacity-40' : ''}`}
                       />
                     </div>
 
                     {/* Metadata Table */}
-                    <div className="flex-grow space-y-2.5 text-[11px] w-full pt-1">
+                    <div className="flex-grow space-y-2 text-[10px] w-full pt-0.5">
                       {/* Subject */}
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
-                          <BookOpen size={10} className="text-[#7D53F6]" />
+                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[7px] flex items-center gap-1">
+                          <BookOpen size={9} className="text-[#7D53F6]" />
                           Subject
                         </span>
-                        <span className="font-extrabold text-slate-700 truncate max-w-[120px]">
+                        <span className="font-extrabold text-slate-700 truncate max-w-[110px]">
                           {resolveSubjectName()}
                         </span>
                       </div>
 
                       {/* Date */}
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
-                          <Calendar size={10} className="text-[#7D53F6]" />
+                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[7px] flex items-center gap-1">
+                          <Calendar size={9} className="text-[#7D53F6]" />
                           Date
                         </span>
                         <span className="font-extrabold text-slate-700">
@@ -526,22 +513,22 @@ function OTPGeneration() {
 
                       {/* Hour (Period) */}
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
-                          <Clock size={10} className="text-[#7D53F6]" />
+                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[7px] flex items-center gap-1">
+                          <Clock size={9} className="text-[#7D53F6]" />
                           Hour
                         </span>
                         <span className="font-extrabold text-slate-700 text-right">
-                          H{selectedHour} ({selectedHourConfig ? `${selectedHourConfig.start_time} - ${selectedHourConfig.end_time}` : '09:00 AM - 10:00 AM'})
+                          H{selectedHour}
                         </span>
                       </div>
 
                       {/* Session ID */}
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[8px] flex items-center gap-1">
-                          <Key size={10} className="text-[#7D53F6]" />
+                        <span className="text-slate-400 font-bold uppercase tracking-wide text-[7px] flex items-center gap-1">
+                          <Key size={9} className="text-[#7D53F6]" />
                           Session ID
                         </span>
-                        <span className="font-extrabold text-slate-700 font-mono tracking-tighter text-[9px] uppercase">
+                        <span className="font-extrabold text-slate-700 font-mono tracking-tighter text-[8px] uppercase">
                           {resolveSessionId()}
                         </span>
                       </div>
@@ -553,34 +540,34 @@ function OTPGeneration() {
           </div>
 
           {/* Action Trigger Buttons & unique session message */}
-          <div className="space-y-4 pt-2">
+          <div className="space-y-2.5 pt-1">
             {activeSession ? (
               <button
                 onClick={handleDeactivateOTP}
-                className="w-full flex items-center justify-center gap-2 py-3.5 font-bold rounded-2xl transition-all duration-200 bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/20 cursor-pointer text-xs"
+                className="w-full flex items-center justify-center gap-2 py-2.5 font-bold rounded-xl transition-all duration-200 bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/10 cursor-pointer text-xs"
               >
-                <AlertCircle size={15} />
+                <AlertCircle size={14} />
                 <span>Deactivate Session Code</span>
               </button>
             ) : (
               <button
                 onClick={handleGenerateOTP}
                 disabled={otpLoading}
-                className="w-full flex items-center justify-center gap-2 py-3.5 font-bold rounded-2xl transition-all duration-200 bg-[#7D53F6] hover:bg-[#683cdb] text-white shadow-lg shadow-[#7D53F6]/20 cursor-pointer text-xs"
+                className="w-full flex items-center justify-center gap-2 py-2.5 font-bold rounded-xl transition-all duration-200 bg-[#7D53F6] hover:bg-[#683cdb] text-white shadow-md shadow-[#7D53F6]/10 cursor-pointer text-xs"
               >
                 {otpLoading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    <QrCode size={15} />
+                    <QrCode size={14} />
                     <span>Generate OTP & QR Code</span>
                   </>
                 )}
               </button>
             )}
 
-            <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-semibold">
-              <CheckCircle2 size={13} className="text-emerald-500" />
+            <div className="flex items-center justify-center gap-1 text-[9px] text-slate-400 font-semibold">
+              <CheckCircle2 size={12} className="text-emerald-500" />
               <span>Each session code is unique and cannot be reused.</span>
             </div>
           </div>
@@ -589,41 +576,41 @@ function OTPGeneration() {
 
         {/* Right Column: Scanned Students List (Only visible when session is active!) */}
         {activeSession && (
-          <div className="xl:col-span-5 space-y-4 border border-slate-100 rounded-3xl p-5 bg-slate-50/30 flex flex-col h-full animate-slideIn">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <h4 className="font-bold text-slate-800 text-xs flex items-center gap-1.5">
-                <UserCheck size={15} className="text-emerald-500" />
+          <div className="xl:col-span-5 space-y-3 border border-slate-100 rounded-2xl p-4 bg-slate-50/20 flex flex-col h-full animate-slideIn max-h-[380px]">
+            <div className="flex justify-between items-center pb-1.5 border-b border-slate-100">
+              <h4 className="font-bold text-slate-800 text-[11px] flex items-center gap-1">
+                <UserCheck size={13} className="text-emerald-500" />
                 Scans Received
               </h4>
-              <span className="bg-emerald-50 text-emerald-600 text-[9px] font-black px-2.5 py-0.5 border border-emerald-100 rounded-full flex items-center gap-1">
+              <span className="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 border border-emerald-100 rounded-full flex items-center gap-1">
                 <RefreshCw size={8} className="animate-spin" /> {scannedStudents.length} logged
               </span>
             </div>
 
-            <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 flex-grow">
+            <div className="space-y-1.5 overflow-y-auto pr-0.5 flex-grow">
               {scannedStudents.length > 0 ? (
                 scannedStudents.map((log) => (
                   <div
                     key={log.id}
-                    className="flex items-center gap-2.5 p-2.5 bg-white border border-slate-100/80 rounded-xl animate-slideIn shadow-xs"
+                    className="flex items-center gap-2 p-2 bg-white border border-slate-100/50 rounded-lg animate-slideIn shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
                   >
-                    <div className="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-extrabold text-[9px] select-none">
+                    <div className="w-5 h-5 rounded bg-emerald-500 text-white flex items-center justify-center font-extrabold text-[8px] select-none">
                       P
                     </div>
                     <div className="truncate">
-                      <span className="font-bold text-slate-700 text-xs block leading-tight">
+                      <span className="font-bold text-slate-700 text-[10px] block leading-tight">
                         {log.student_name}
                       </span>
-                      <span className="text-[8px] text-slate-400 font-bold block mt-0.5">
+                      <span className="text-[7px] text-slate-400 font-bold block mt-0.5">
                         Logged at {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-20 text-slate-400 text-xs">
+                <div className="text-center py-12 text-slate-400 text-[10px]">
                   <p className="font-semibold leading-relaxed">
-                    Waiting for students to scan or enter OTP...
+                    Waiting for scans...
                   </p>
                 </div>
               )}
