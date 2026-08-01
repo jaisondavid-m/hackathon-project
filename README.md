@@ -4,10 +4,6 @@
 
 > **🌐 Live Demo:** [https://pcdp-v4.bitsathy.in](https://pcdp-v4.bitsathy.in/)
 
-![Geofencing](https://img.shields.io/badge/🛰️_Core%20Security-Digital%20Geofencing-2563eb?style=for-the-badge)
-![WiFi Matching](https://img.shields.io/badge/📶_Core%20Security-WiFi%20Router%20Matching-16a34a?style=for-the-badge)
-![Zero Proxy](https://img.shields.io/badge/Result-Zero%20Proxy%20Attendance-e11d48?style=for-the-badge)
-
 ---
 
 ## 👥 Team Details
@@ -48,60 +44,29 @@ Traditional classroom attendance methods—and even basic digital barcode/OTP sy
 
 ---
 
-# 🛡️ Our Solution: Double-Lock Physical Presence Verification
+## 🛡️ Our Solution: How it Solves Attendance Exploits
 
-> ## 🔑 THIS IS THE HEART OF THE SYSTEM
-> Every other feature (hashing, expiry, audit logs) exists to protect **these two checks**. Together they make it mathematically and physically impossible to mark attendance from outside the classroom.
+This system solves the proxy problem by enforcing **Double-Lock Verification** using location boundaries, local WiFi connections, and request security mechanisms.
 
-This system solves the proxy problem by enforcing **Double-Lock Verification** using location boundaries, local WiFi connections, and request security mechanisms — validated with a **Hybrid "OR" check**: if **either** of the two independent methods below succeeds, attendance is marked.
+### 1. Hybrid "OR" Verification
+To successfully submit an attendance code, the system validates the student using two independent checks. **If either validation is successful, attendance is marked:**
+* ***Digital Geofencing (Classroom Boundaries)***: The system draws a precise virtual polygon around the physical classroom. The student's device must be within these GPS coordinates.
+* ***WiFi Router Matching (Campus Network)***: The system detects the student's connection IP address and verifies it against the specific physical routers installed inside that classroom. 
 
-<br>
+*Why this works:* A student sitting in the hostel cannot mark attendance because they are outside the classroom coordinates and not connected to that room's specific WiFi router—even if a friend sends them the OTP code.
 
-## 🛰️ Method 1 — Digital Geofencing *(Classroom Boundaries)*
-
-> ### 📍 The system draws a precise virtual polygon around the physical classroom using real-world GPS coordinates.
->
-> The student's device must fall **inside these exact boundaries** to pass this check.
->
-> **How it's enforced:** a mathematical **ray-casting polygon algorithm** on the backend checks whether the student's live coordinate point lies inside the 4-point classroom polygon — no manual override, no approximation.
-
-<br>
-
-## 📶 Method 2 — WiFi Router Matching *(Campus Network)*
-
-> ### 📡 The system detects the student's connection IP address and matches it against the specific physical router installed inside that exact classroom.
->
-> If the student's device isn't connected to **that room's registered router**, this check fails — connecting to a *different* campus WiFi network doesn't count.
->
-> **How it's enforced:** every venue has router IPs pre-registered by the Admin console, and each check-in request is validated against that mapping in real time.
-
-<br>
-
-| ⚔️ Attack Scenario | 🛰️ Geofencing Catches It? | 📶 WiFi Matching Catches It? |
-|---|:---:|:---:|
-| Friend photographs the QR/OTP and sends it to a student in the hostel | ✅ Blocked — outside polygon | ✅ Blocked — wrong/no router |
-| Student is in a *different* classroom on campus | ✅ Blocked — outside polygon | ✅ Blocked — wrong router |
-| GPS spoofed, but device is off campus WiFi | ⚠️ Possible bypass | ✅ Blocked — wrong router |
-| On correct WiFi, but physically outside the room | ✅ Blocked — outside polygon | ⚠️ Possible bypass |
-
-> 💡 **Why "OR" instead of "AND":** requiring *both* every time would fail legitimate students the moment GPS drifts indoors or WiFi briefly drops. Requiring *either* keeps the experience reliable while still requiring genuine physical proof — since faking **both** simultaneously from outside the room is what a proxy attempt would need to do, and can't.
-
----
-
-### Additional Layers Protecting the Two Checks Above
-
-### 🕒 Time-Restricted Sessions (7 Second Expiry)
+### 2. Time-Restricted Sessions (7 Seconds Expiry)
 Attendance codes are dynamically generated and expire automatically after 7 seconds. This creates a tiny window of opportunity that prevents sharing codes for later use.
 
-### 🔒 Hashed OTP Verification
-To prevent students from sniffing/monitoring HTTP request payloads and manually marking attendance using external platforms like Postman, the system employs a secure hashing algorithm.
+### Hashed OTP Verification
+To prevent students from sniffing/monitoring HTTP request payloads and manually marking attendance using external platforms like Postman, the system employs a secure hashing algorithm. 
 * **Client-Side Hashing**: The student's device hashes the OTP code before transmitting it.
 * **Backend Validation**: The Go backend verifies and validates the hashed value rather than raw texts, blocking requests from being intercepted and replayed manually.
 
-### 📊 Clear Verification Audits
+### 3. Clear Verification Audits
 Administrative panels log exactly how each student was verified (e.g., *"Verified via classroom WiFi Router (IP: 192.168.1.10)"* or *"Verified via Geofence GPS Coordinates"*). This creates a high-trust verification trail.
 
-### 🚨 Admin Threat Notifications & Logs
+### 4. Admin Threat Notifications & Logs
 If any user attempts to perform unauthorized actions repeatedly (again and again), the system automatically acts to flag the behavior:
 * **Admin Notifications & Mail**: The system triggers real-time alerts and dispatches emails to the administrator using the Go backend's `gomail` integration.
 * **Audit Inspection**: Admins can instantly review the logs to trace the actor's history, specific actions, timestamps, and client IP addresses.
@@ -178,7 +143,7 @@ The Student console offers quick and secure attendance marking:
 ### For Students
 1. **Scan QR Code**: Open the console on a mobile browser and scan the classroom QR code.
 2. **Mark Attendance**: Enter the OTP. The system automatically fetches device coordinates and network IP details in the background.
-3. **Instant Validation**: If the student is physically present inside the boundary **or** connected to the classroom WiFi, the present status is instantly recorded.
+3. **Instant Validation**: If the student is physically present inside the boundary or connected to the classroom WiFi, the present status is instantly recorded.
 
 ---
 
@@ -278,7 +243,6 @@ docker compose up --build
 ```
 The client console will be exposed on port `80`, and backend APIs will run on port `8080`.
 
----
 
-for overview, view this docs drive:
+for overview , view this docs drive
 https://drive.google.com/file/d/1TUOYvGUh_EhXUFqpBDrns-k0nHR1PaIc/view?usp=sharing
