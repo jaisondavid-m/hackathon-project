@@ -1,8 +1,8 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { 
-  User, Mail, Shield, BookOpen, GraduationCap, Award, Key, 
-  CheckCircle, Clock, MapPin, Layers, Sparkles 
+import {
+  User, Mail, Shield, BookOpen, GraduationCap, Key,
+  CheckCircle, Layers, Sparkles
 } from 'lucide-react';
 
 function Profile() {
@@ -83,89 +83,77 @@ function Profile() {
   const HeaderIcon = roleConfig.icon;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 py-2 animate-fadeIn">
-      {/* Page Header */}
-      <div className="flex items-center gap-3 border-b border-slate-100 pb-5">
-        <div className="p-3 bg-[#7D53F6]/10 text-[#7D53F6] rounded-2xl">
-          <User size={24} className="stroke-[2.5]" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Profile Overview</h1>
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mt-0.5">
-            User Identification & Credential Details
-          </p>
-        </div>
-      </div>
+    <div className="max-w-4xl mx-auto space-y-4 animate-fadeIn">
 
       {/* Main Profile Info Card */}
-      <div className="bg-white rounded-[32px] border border-slate-100/80 shadow-xl overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md overflow-hidden">
         {/* Banner Header */}
-        <div className={`h-36 bg-gradient-to-r ${roleConfig.gradient} relative flex items-end p-6 sm:p-8`}>
-          <div className="absolute top-4 right-6 text-white/10">
-            <HeaderIcon size={120} />
+        <div className={`h-24 sm:h-28 bg-gradient-to-r ${roleConfig.gradient} relative flex items-end p-4 sm:p-6`}>
+          <div className="absolute top-2 right-4 text-white/10">
+            <HeaderIcon size={90} />
           </div>
-          <div className="flex items-center gap-4 translate-y-12">
-            <div className="w-24 h-24 rounded-3xl bg-white shadow-xl border-4 border-white flex items-center justify-center text-slate-800 text-3xl font-black">
+          <div className="flex items-center gap-4 translate-y-8 sm:translate-y-10">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white shadow-lg border-4 border-white flex items-center justify-center text-slate-800 text-xl sm:text-2xl font-black">
               {getInitials(user?.name)}
             </div>
           </div>
         </div>
 
-        <div className="pt-16 p-6 sm:p-8 space-y-8">
+        <div className="pt-10 sm:pt-12 p-4 sm:p-6 space-y-4 sm:space-y-5">
           {/* User Name & Role Pill */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
             <div>
-              <h2 className="text-2xl font-black text-slate-800">{user?.name || 'User Name'}</h2>
-              <p className="text-slate-400 font-semibold text-sm mt-0.5">{user?.emailid || 'user@example.com'}</p>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-800 leading-tight">{user?.name || 'User Name'}</h2>
+              <p className="text-slate-400 font-semibold text-xs mt-0.5">{user?.emailid || 'user@example.com'}</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border ${roleConfig.badgeBg}`}>
+              <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border ${roleConfig.badgeBg}`}>
                 {roleConfig.label}
               </span>
-              <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center gap-1.5">
-                <CheckCircle size={14} />
-                <span>Active Account</span>
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center gap-1">
+                <CheckCircle size={12} />
+                <span>Active</span>
               </span>
             </div>
           </div>
 
           {/* Core Info Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5">
+
             {/* Full Name */}
-            <div className="p-5 bg-slate-50/60 border border-slate-100 rounded-2xl flex items-start gap-4">
-              <div className="p-2.5 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl flex-shrink-0">
-                <User size={20} />
+            <div className="p-3.5 sm:p-4 bg-slate-50/60 border border-slate-100 rounded-xl flex items-center gap-3">
+              <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-lg flex-shrink-0">
+                <User size={18} />
               </div>
               <div className="truncate">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Full Name</span>
-                <span className="font-extrabold text-slate-800 text-base truncate block mt-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none">Full Name</span>
+                <span className="font-extrabold text-slate-800 text-sm truncate block mt-0.5">
                   {user?.name || 'N/A'}
                 </span>
               </div>
             </div>
 
             {/* Reference ID */}
-            <div className="p-5 bg-slate-50/60 border border-slate-100 rounded-2xl flex items-start gap-4">
-              <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl flex-shrink-0">
-                <HeaderIcon size={20} />
+            <div className="p-3.5 sm:p-4 bg-slate-50/60 border border-slate-100 rounded-xl flex items-center gap-3">
+              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg flex-shrink-0">
+                <HeaderIcon size={18} />
               </div>
               <div className="truncate">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Reference ID</span>
-                <span className="font-extrabold text-slate-800 text-base truncate block mt-1 font-mono">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none">Reference ID</span>
+                <span className="font-extrabold text-slate-800 text-sm truncate block mt-0.5 font-mono">
                   {roleConfig.idPrefix}{user?.id || '01'}
                 </span>
               </div>
             </div>
 
             {/* Department */}
-            <div className="p-5 bg-slate-50/60 border border-slate-100 rounded-2xl flex items-start gap-4">
-              <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl flex-shrink-0">
-                <BookOpen size={20} />
+            <div className="p-3.5 sm:p-4 bg-slate-50/60 border border-slate-100 rounded-xl flex items-center gap-3">
+              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg flex-shrink-0">
+                <BookOpen size={18} />
               </div>
               <div className="truncate">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Department</span>
-                <span className="font-extrabold text-slate-800 text-base truncate block mt-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none">Department</span>
+                <span className="font-extrabold text-slate-800 text-sm truncate block mt-0.5">
                   {roleConfig.dept}
                 </span>
               </div>
@@ -173,37 +161,37 @@ function Profile() {
 
             {/* Role Specific Extra Field */}
             {role === 'student' ? (
-              <div className="p-5 bg-slate-50/60 border border-slate-100 rounded-2xl flex items-start gap-4">
-                <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl flex-shrink-0">
-                  <GraduationCap size={20} />
+              <div className="p-3.5 sm:p-4 bg-slate-50/60 border border-slate-100 rounded-xl flex items-center gap-3">
+                <div className="p-2 bg-amber-50 text-amber-600 rounded-lg flex-shrink-0">
+                  <GraduationCap size={18} />
                 </div>
                 <div className="truncate">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Year / Semester</span>
-                  <span className="font-extrabold text-slate-800 text-base truncate block mt-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none">Year / Semester</span>
+                  <span className="font-extrabold text-slate-800 text-sm truncate block mt-0.5">
                     III Year (6th Semester)
                   </span>
                 </div>
               </div>
             ) : role === 'faculty' ? (
-              <div className="p-5 bg-slate-50/60 border border-slate-100 rounded-2xl flex items-start gap-4">
-                <div className="p-2.5 bg-purple-50 text-purple-600 rounded-xl flex-shrink-0">
-                  <Layers size={20} />
+              <div className="p-3.5 sm:p-4 bg-slate-50/60 border border-slate-100 rounded-xl flex items-center gap-3">
+                <div className="p-2 bg-purple-50 text-purple-600 rounded-lg flex-shrink-0">
+                  <Layers size={18} />
                 </div>
                 <div className="truncate">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Assigned Classes</span>
-                  <span className="font-extrabold text-slate-800 text-base truncate block mt-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none">Assigned Classes</span>
+                  <span className="font-extrabold text-slate-800 text-sm truncate block mt-0.5">
                     CS101, CS202, CS305
                   </span>
                 </div>
               </div>
             ) : (
-              <div className="p-5 bg-slate-50/60 border border-slate-100 rounded-2xl flex items-start gap-4">
-                <div className="p-2.5 bg-rose-50 text-rose-600 rounded-xl flex-shrink-0">
-                  <Shield size={20} />
+              <div className="p-3.5 sm:p-4 bg-slate-50/60 border border-slate-100 rounded-xl flex items-center gap-3">
+                <div className="p-2 bg-rose-50 text-rose-600 rounded-lg flex-shrink-0">
+                  <Shield size={18} />
                 </div>
                 <div className="truncate">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Security Level</span>
-                  <span className="font-extrabold text-slate-800 text-base truncate block mt-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none">Security Level</span>
+                  <span className="font-extrabold text-slate-800 text-sm truncate block mt-0.5">
                     Level 5 - Root Admin Access
                   </span>
                 </div>
@@ -211,13 +199,13 @@ function Profile() {
             )}
 
             {/* Email Address */}
-            <div className="p-5 bg-slate-50/60 border border-slate-100 rounded-2xl flex items-start gap-4 md:col-span-2">
-              <div className="p-2.5 bg-sky-50 text-sky-600 rounded-xl flex-shrink-0">
-                <Mail size={20} />
+            <div className="p-3.5 sm:p-4 bg-slate-50/60 border border-slate-100 rounded-xl flex items-center gap-3 md:col-span-2">
+              <div className="p-2 bg-sky-50 text-sky-600 rounded-lg flex-shrink-0">
+                <Mail size={18} />
               </div>
               <div className="truncate">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Email Address</span>
-                <span className="font-extrabold text-slate-800 text-base truncate block mt-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none">Email Address</span>
+                <span className="font-extrabold text-slate-800 text-sm truncate block mt-0.5">
                   {user?.emailid || 'N/A'}
                 </span>
               </div>
@@ -226,18 +214,18 @@ function Profile() {
           </div>
 
           {/* Module Privileges / Responsibilities Card */}
-          <div className="p-6 bg-[#EEF1F9]/40 border border-slate-100 rounded-2xl space-y-3">
-            <div className="flex items-center gap-2 text-slate-700 font-extrabold text-sm uppercase tracking-wider">
-              <Sparkles size={16} className="text-[#7D53F6]" />
+          <div className="p-4 bg-[#EEF1F9]/40 border border-slate-100 rounded-xl space-y-2">
+            <div className="flex items-center gap-1.5 text-slate-700 font-extrabold text-xs uppercase tracking-wider">
+              <Sparkles size={14} className="text-[#7D53F6]" />
               <span>Role Permissions & Authorized Scope</span>
             </div>
-            <div className="flex flex-wrap gap-2 pt-1">
+            <div className="flex flex-wrap gap-1.5 pt-0.5">
               {roleConfig.responsibilities.map((resp, idx) => (
-                <span 
-                  key={idx} 
-                  className="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 font-bold text-xs rounded-xl shadow-2xs flex items-center gap-1.5"
+                <span
+                  key={idx}
+                  className="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 font-bold text-[11px] rounded-lg shadow-2xs flex items-center gap-1"
                 >
-                  <CheckCircle size={13} className="text-emerald-500" />
+                  <CheckCircle size={12} className="text-emerald-500 flex-shrink-0" />
                   <span>{resp}</span>
                 </span>
               ))}
