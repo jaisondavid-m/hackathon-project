@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Percent, CheckCircle, XCircle } from 'lucide-react';
 import HistoryLogs from './HistoryLogs';
@@ -6,8 +6,16 @@ import HistoryLogs from './HistoryLogs';
 function StudentHistory() {
   const { records } = useOutletContext();
 
-  // Get all unique dates from the records list
-  const uniqueDates = Array.from(new Set(records.map(r => r.date)));
+  // Get all unique dates from the records list (sorted descending: latest first)
+  const uniqueDates = Array.from(new Set(records.map(r => r.date))).sort((a, b) => b.localeCompare(a));
+
+  const [selectedDate, setSelectedDate] = useState('');
+
+  useEffect(() => {
+    if (uniqueDates.length > 0 && !selectedDate) {
+      setSelectedDate(uniqueDates[0]);
+    }
+  }, [uniqueDates, selectedDate]);
 
   // Generate full records including absent ones
   const fullRecords = [...records];
@@ -35,10 +43,13 @@ function StudentHistory() {
     }
   });
 
-  // Calculate statistics based on full records (including dynamic absent ones)
-  const total = fullRecords.length;
-  const presentCount = fullRecords.filter(r => r.status === 'present' || r.status === 'late').length;
-  const absentCount = fullRecords.filter(r => r.status === 'absent').length;
+  // Filter fullRecords for the selectedDate
+  const dailyRecords = selectedDate ? fullRecords.filter(r => r.date === selectedDate) : [];
+
+  // Calculate statistics based on dailyRecords (selected date's attendance)
+  const total = dailyRecords.length;
+  const presentCount = dailyRecords.filter(r => r.status === 'present' || r.status === 'late').length;
+  const absentCount = dailyRecords.filter(r => r.status === 'absent').length;
   const percentage = total > 0 ? Math.round((presentCount / total) * 100) : 0;
 
   const getPercentageColor = (pct) => {
@@ -55,12 +66,30 @@ function StudentHistory() {
 
   return (
     <div className="space-y-6">
+      {/* Date Selector Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl border border-slate-100/80 shadow-md p-6">
+        <div>
+          <h2 className="text-base font-bold text-slate-800 leading-none">Select Attendance Date</h2>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5 leading-none">
+            Filter attendance records and daily statistics by date
+          </p>
+        </div>
+        <div className="relative">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl focus:outline-none focus:border-[#7D53F6] focus:ring-4 focus:ring-[#7D53F6]/10 transition-all duration-200 cursor-pointer"
+          />
+        </div>
+      </div>
+
       {/* Top Stats Bar */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Attendance Percentage */}
         <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md p-6 flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Attendance Rate</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Daily Attendance Rate</span>
             <span className={`text-3xl font-black ${getPercentageColor(percentage)} block mt-1`}>
               {percentage}%
             </span>
@@ -98,7 +127,7 @@ function StudentHistory() {
       </div>
 
       {/* History Logs */}
-      <HistoryLogs records={fullRecords} />
+      <HistoryLogs records={dailyRecords} />
     </div>
   );
 }

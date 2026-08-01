@@ -212,26 +212,6 @@ function Profile() {
             </div>
 
           </div>
-
-          {/* Module Privileges / Responsibilities Card */}
-          <div className="p-4 bg-[#EEF1F9]/40 border border-slate-100 rounded-xl space-y-2">
-            <div className="flex items-center gap-1.5 text-slate-700 font-extrabold text-xs uppercase tracking-wider">
-              <Sparkles size={14} className="text-[#7D53F6]" />
-              <span>Role Permissions & Authorized Scope</span>
-            </div>
-            <div className="flex flex-wrap gap-1.5 pt-0.5">
-              {roleConfig.responsibilities.map((resp, idx) => (
-                <span
-                  key={idx}
-                  className="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 font-bold text-[11px] rounded-lg shadow-2xs flex items-center gap-1"
-                >
-                  <CheckCircle size={12} className="text-emerald-500 flex-shrink-0" />
-                  <span>{resp}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
