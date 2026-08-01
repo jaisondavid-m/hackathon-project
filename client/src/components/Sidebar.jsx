@@ -22,6 +22,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
     if (path.includes('/faculty/otp')) return 'otp';
     if (path.includes('/faculty/timetable')) return 'timetable';
     if (path.includes('/faculty/my-attendance')) return 'my-attendance';
+    if (path.includes('/faculty/profile')) return 'faculty-profile';
     if (path.includes('/student/dashboard')) return 'student-dashboard';
     if (path.includes('/student/otp')) return 'student-otp';
     if (path.includes('/student/history')) return 'student-history';
@@ -46,6 +47,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
       { id: 'otp', path: '/faculty/otp', label: 'Attendance', icon: ClipboardList },
       { id: 'timetable', path: '/faculty/timetable', label: 'Time Table', icon: Calendar },
       { id: 'my-attendance', path: '/faculty/my-attendance', label: 'My Attendance', icon: UserCheck },
+      { id: 'faculty-profile', path: '/faculty/profile', label: 'Profile', icon: User },
     ],
     student: [
       { id: 'student-dashboard', path: '/student/dashboard', label: 'Dashboard', icon: LayoutDashboard },
