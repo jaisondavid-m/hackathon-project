@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, Menu } from 'lucide-react';
+import { Bell, Menu, X } from 'lucide-react';
 
 function Navbar({ user, onLogout, toggleMobileSidebar }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   if (!user) return null;
 
@@ -43,6 +44,32 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
     }
   };
 
+  const getNotificationContent = () => {
+  switch (user.role) {
+    case 'admin':
+      return {
+        title: 'Security Alert',
+        message: 'Unauthorized activity has been detected. Please review the Audit Logs page to investigate and monitor the issue.',
+        type: 'warning'
+      };
+
+    case 'faculty':
+      return {
+        title: 'Meeting Reminder',
+        message: 'This is a reminder that you have a meeting scheduled from 11:00 AM to 11:30 AM in Seminar Hall 2.',
+        type: 'info'
+      };
+
+    case 'student':
+    default:
+      return {
+        title: 'Attendance Reminder',
+        message: 'Please maintain a minimum attendance of 80% to remain eligible for the semester-end examinations.',
+        type: 'action'
+      };
+  }
+};
+
   return (
     <header className="h-16 px-4 sm:px-8 flex justify-between items-center bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm flex-shrink-0">
       {/* Left Side: Burger Menu Toggle & Page Title */}
@@ -67,7 +94,10 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
       <div className="flex items-center gap-3 sm:gap-4">
         {/* Bell Notification widget */}
         <div className="relative">
-          <button className="p-2 bg-[#7D53F6]/5 hover:bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl flex items-center justify-center border border-[#7D53F6]/10 cursor-pointer transition-colors shadow-sm">
+          <button 
+            onClick={() => setShowNotifications(true)}
+            className="p-2 bg-[#7D53F6]/5 hover:bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl flex items-center justify-center border border-[#7D53F6]/10 cursor-pointer transition-colors shadow-sm focus:outline-none"
+          >
             <Bell size={18} className="stroke-[2.5]" />
           </button>
           <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#7D53F6] rounded-full border border-white" />
@@ -92,6 +122,59 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
           </div>
         </button>
       </div>
+
+      {/* Notifications Modal */}
+      {showNotifications && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[24px] shadow-2xl max-w-md w-full border border-slate-100/85 overflow-hidden animate-fadeIn">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-2.5 h-2.5 rounded-full ${
+                  getNotificationContent().type === 'warning' ? 'bg-amber-500' :
+                  getNotificationContent().type === 'info' ? 'bg-blue-500' : 'bg-[#7D53F6]'
+                }`} />
+                <span className="font-extrabold text-slate-800 text-sm sm:text-base uppercase tracking-wider">
+                  {getNotificationContent().title}
+                </span>
+              </div>
+              <button 
+                onClick={() => setShowNotifications(false)}
+                className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-xl transition-colors cursor-pointer focus:outline-none"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="p-6">
+              <div className={`p-4 rounded-2xl border ${
+                getNotificationContent().type === 'warning' ? 'bg-amber-50/30 border-amber-100 text-amber-900' :
+                getNotificationContent().type === 'info' ? 'bg-blue-50/30 border-blue-100 text-blue-900' : 
+                'bg-violet-50/30 border-violet-100 text-violet-900'
+              }`}>
+                <p className="text-sm font-semibold leading-relaxed">
+                  {getNotificationContent().message}
+                </p>
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-end">
+              <button 
+                onClick={() => setShowNotifications(false)}
+                className={`px-5 py-2.5 rounded-xl font-bold text-xs cursor-pointer transition-colors shadow-sm focus:outline-none ${
+                  getNotificationContent().type === 'warning' ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/10' :
+                  getNotificationContent().type === 'info' ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-500/10' : 
+                  'bg-[#7D53F6] hover:bg-[#6C42E2] text-white shadow-[#7D53F6]/10'
+                }`}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

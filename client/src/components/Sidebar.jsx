@@ -13,16 +13,13 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
     const path = location.pathname;
     if (path.includes('/admin/users')) return 'users';
     if (path.includes('/admin/venues')) return 'venues';
+    if (path.includes('/admin/working-days')) return 'working-days';
     if (path.includes('/admin/session-details')) return 'session-details';
     if (path.includes('/admin/otp-mapping')) return 'otp-mapping';
     if (path.includes('/admin/audit-logs')) return 'audit';
-    if (path.includes('/admin/profile')) return 'admin-profile';
-    if (path.includes('/faculty/dashboard')) return 'faculty-dashboard';
     if (path.includes('/faculty/otp')) return 'otp';
     if (path.includes('/faculty/timetable')) return 'timetable';
     if (path.includes('/faculty/my-attendance')) return 'my-attendance';
-    if (path.includes('/faculty/profile')) return 'faculty-profile';
-    if (path.includes('/student/dashboard')) return 'student-dashboard';
     if (path.includes('/student/otp')) return 'student-otp';
     if (path.includes('/student/history')) return 'student-history';
     if (path.includes('/student/profile')) return 'student-profile';
@@ -35,23 +32,20 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
   const menuItems = {
     admin: [
       { id: 'venues', path: '/admin/venues', label: 'Venue Management', icon: MapPin },
+      { id: 'working-days', path: '/admin/working-days', label: 'Working Day Mapping', icon: Calendar },
       { id: 'otp-mapping', path: '/admin/otp-mapping', label: 'OTP Mapping', icon: Layers },
       { id: 'session-details', path: '/admin/session-details', label: 'Session Details', icon: Clock },
       { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', icon: Layers },
       { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
-      { id: 'admin-profile', path: '/admin/profile', label: 'Profile', icon: User },
     ],
     faculty: [
-      { id: 'faculty-dashboard', path: '/faculty/dashboard', label: 'Dashboard', icon: Layers },
-      { id: 'otp', path: '/faculty/otp', label: 'OTP Generation', icon: ClipboardList },
+      { id: 'otp', path: '/faculty/otp', label: 'Attendance', icon: ClipboardList },
       { id: 'timetable', path: '/faculty/timetable', label: 'Time Table', icon: Calendar },
       { id: 'my-attendance', path: '/faculty/my-attendance', label: 'My Attendance', icon: UserCheck },
-      { id: 'faculty-profile', path: '/faculty/profile', label: 'Profile', icon: User },
     ],
     student: [
-      { id: 'student-dashboard', path: '/student/dashboard', label: 'Dashboard', icon: Layers },
       { id: 'student-otp', path: '/student/otp', label: 'Mark Attendance', icon: UserCheck },
-      { id: 'student-history', path: '/student/history', label: 'Attendance History', icon: ClipboardList },
+      { id: 'student-history', path: '/student/history', label: 'Attendance History', icon: Layers },
       { id: 'student-profile', path: '/student/profile', label: 'Profile', icon: User },
     ],
   };
