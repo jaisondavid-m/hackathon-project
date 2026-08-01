@@ -52,7 +52,7 @@ func InitDB(dsn string) (*gorm.DB, error) {
 	log.Println("Database connection established successfully")
 
 	// Run migrations
-	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{}, &models.AttendanceSession{}, &models.AttendanceRecord{}, &models.Venue{}, &models.AuditLog{}, &models.OtpMapping{}, &models.OtpMappingStudent{})
+	err = DB.AutoMigrate(&models.User{}, &models.HourConfig{}, &models.HolidayConfig{}, &models.AttendanceSession{}, &models.AttendanceRecord{}, &models.Venue{}, &models.VenueRouter{}, &models.AuditLog{}, &models.OtpMapping{}, &models.OtpMappingStudent{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to auto-migrate database: %w", err)
 	}
