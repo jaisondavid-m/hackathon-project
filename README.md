@@ -18,6 +18,20 @@
 
 ---
 
+## 🎨 UI/UX Design (Figma)
+
+The complete UI/UX design prototype for this project was crafted in Figma:
+
+🔗 **[View Figma Design – TEAM DYNAMICS](https://www.figma.com/design/mKhML6UidHn7HS4MexHyVF/TEAM-DYNAMICS?node-id=0-1)**
+
+---
+
+## 📋 Software Requirements Specification (SRS)
+
+The full SRS document outlining functional requirements, system architecture, and use cases:
+
+🔗 **[View SRS Document on Banani](https://app.banani.co/preview/-2SNztMxCEj5?screen=SRS-Presentation)**
+
 **Attendance Monitoring with QR Code Check-in** is an intelligent, high-trust classroom attendance system designed to eliminate "proxy" attendance and check-in manipulation. By combining location verification, local campus network validation, and secure cryptographic handshakes, the system guarantees that attendance can only be marked by students physically present in the classroom.
 
 ---
