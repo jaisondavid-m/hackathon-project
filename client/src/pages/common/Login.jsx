@@ -15,8 +15,7 @@ function Login({ onLoginSuccess }) {
     const initGoogle = () => {
       if (window.google) {
         window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "17897891420-dpioa5k2k9rcvu1gl8obg2ck3ga03t5a.apps.googleusercontent.com
-",
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "17897891420-dpioa5k2k9rcvu1gl8obg2ck3ga03t5a.apps.googleusercontent.com",
           callback: handleGoogleLoginSuccess
         });
         window.google.accounts.id.renderButton(
