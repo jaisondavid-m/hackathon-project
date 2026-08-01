@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock, ClipboardList, UserCheck, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Users, Settings, Layers, Key, X, MapPin, Calendar, Clock, ClipboardList, UserCheck, User, LogOut, LayoutDashboard, Bell } from 'lucide-react';
 
 function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
   const location = useLocation();
@@ -17,6 +17,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
     if (path.includes('/admin/session-details')) return 'session-details';
     if (path.includes('/admin/otp-mapping')) return 'otp-mapping';
     if (path.includes('/admin/audit-logs')) return 'audit';
+    if (path.includes('/admin/notifications')) return 'notifications';
     if (path.includes('/faculty/dashboard')) return 'faculty-dashboard';
     if (path.includes('/faculty/otp')) return 'otp';
     if (path.includes('/faculty/timetable')) return 'timetable';
@@ -38,6 +39,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
       { id: 'session-details', path: '/admin/session-details', label: 'Session Details', icon: Clock },
       { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', icon: Layers },
       { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
+      { id: 'notifications', path: '/admin/notifications', label: 'Send Notifications', icon: Bell },
     ],
     faculty: [
       { id: 'faculty-dashboard', path: '/faculty/dashboard', label: 'Dashboard', icon: LayoutDashboard },

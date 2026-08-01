@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Bell, Menu, X } from 'lucide-react';
 
@@ -6,6 +6,96 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [hasUnread, setHasUnread] = useState(false);
+
+  useEffect(() => {
+    checkUnread();
+  }, []);
+
+  // Listen for local storage change events or custom dispatch triggers
+  useEffect(() => {
+    if (showNotifications) {
+      loadUserNotifications();
+      setHasUnread(false);
+    }
+  }, [showNotifications]);
+
+  const checkUnread = () => {
+    try {
+      const stored = localStorage.getItem('pcdp_notifications');
+      if (stored) {
+        const notifs = JSON.parse(stored);
+        const filtered = notifs.filter(n => {
+          if (n.target === 'all') return true;
+          if (n.target === user.role) return true;
+          if (n.target === 'user' && n.targetEmail.toLowerCase() === user.emailid.toLowerCase()) return true;
+          return false;
+        });
+        setHasUnread(filtered.length > 0);
+      } else {
+        setHasUnread(true); // default notification exists
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const loadUserNotifications = () => {
+    try {
+      let stored = localStorage.getItem('pcdp_notifications');
+      let notifsList = [];
+      if (stored) {
+        notifsList = JSON.parse(stored);
+      } else {
+        // Pre-populate defaults
+        notifsList = [
+          {
+            id: 'notif-1',
+            title: 'Security Alert',
+            message: 'Unauthorized activity has been detected. Please review the Audit Logs page to investigate and monitor the issue.',
+            type: 'warning',
+            target: 'admin',
+            targetEmail: '',
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'notif-2',
+            title: 'Meeting Reminder',
+            message: 'This is a reminder that you have a meeting scheduled from 11:00 AM to 11:30 AM in Seminar Hall 2.',
+            type: 'info',
+            target: 'faculty',
+            targetEmail: '',
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'notif-3',
+            title: 'Attendance Reminder',
+            message: 'Please maintain a minimum attendance of 80% to remain eligible for the semester-end examinations.',
+            type: 'success',
+            target: 'student',
+            targetEmail: '',
+            createdAt: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem('pcdp_notifications', JSON.stringify(notifsList));
+      }
+
+      // Filter targeted to user
+      const filtered = notifsList.filter(n => {
+        if (n.target === 'all') return true;
+        if (n.target === user.role) return true;
+        if (n.target === 'user' && n.targetEmail.toLowerCase() === user.emailid.toLowerCase()) return true;
+        return false;
+      });
+
+      // Sort newest first
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setNotifications(filtered);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   if (!user) return null;
 
@@ -16,6 +106,7 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
     if (path.includes('/admin/venues')) return 'Venue Management';
     if (path.includes('/admin/session-details')) return 'Session Details';
     if (path.includes('/admin/audit-logs')) return 'Audit Logs';
+    if (path.includes('/admin/notifications')) return 'Notification Center';
     if (path.includes('/faculty/dashboard')) return 'Faculty Dashboard';
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
     if (path.includes('/faculty/timetable')) return 'Time Table';
@@ -43,32 +134,6 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
       default: return 'Student Console';
     }
   };
-
-  const getNotificationContent = () => {
-  switch (user.role) {
-    case 'admin':
-      return {
-        title: 'Security Alert',
-        message: 'Unauthorized activity has been detected. Please review the Audit Logs page to investigate and monitor the issue.',
-        type: 'warning'
-      };
-
-    case 'faculty':
-      return {
-        title: 'Meeting Reminder',
-        message: 'This is a reminder that you have a meeting scheduled from 11:00 AM to 11:30 AM in Seminar Hall 2.',
-        type: 'info'
-      };
-
-    case 'student':
-    default:
-      return {
-        title: 'Attendance Reminder',
-        message: 'Please maintain a minimum attendance of 80% to remain eligible for the semester-end examinations.',
-        type: 'action'
-      };
-  }
-};
 
   return (
     <header className="h-16 px-4 sm:px-8 flex justify-between items-center bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm flex-shrink-0">
@@ -100,7 +165,9 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
           >
             <Bell size={18} className="stroke-[2.5]" />
           </button>
-          <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#7D53F6] rounded-full border border-white" />
+          {hasUnread && (
+            <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full border border-white animate-pulse" />
+          )}
         </div>
 
         {/* Profile Card */}
@@ -130,12 +197,9 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
             {/* Modal Header */}
             <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 flex-shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className={`w-2.5 h-2.5 rounded-full ${
-                  getNotificationContent().type === 'warning' ? 'bg-amber-500' :
-                  getNotificationContent().type === 'info' ? 'bg-blue-500' : 'bg-[#7D53F6]'
-                }`} />
+                <div className="w-2 h-2 rounded-full bg-[#7D53F6]" />
                 <span className="font-extrabold text-slate-800 text-sm sm:text-base uppercase tracking-wider">
-                  {getNotificationContent().title}
+                  Notification Center ({notifications.length})
                 </span>
               </div>
               <button 
@@ -147,27 +211,42 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
             </div>
             
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto flex-grow">
-              <div className={`p-4 rounded-2xl border ${
-                getNotificationContent().type === 'warning' ? 'bg-amber-50/30 border-amber-100 text-amber-900' :
-                getNotificationContent().type === 'info' ? 'bg-blue-50/30 border-blue-100 text-blue-900' : 
-                'bg-violet-50/30 border-violet-100 text-violet-900'
-              }`}>
-                <p className="text-sm font-semibold leading-relaxed">
-                  {getNotificationContent().message}
-                </p>
-              </div>
+            <div className="p-6 overflow-y-auto flex-grow space-y-3.5">
+              {notifications.length > 0 ? (
+                notifications.map((notif) => (
+                  <div 
+                    key={notif.id} 
+                    className={`p-4 rounded-2xl border flex flex-col gap-1 ${
+                      notif.type === 'warning' ? 'bg-amber-50/40 border-amber-100/80 text-amber-900' :
+                      notif.type === 'error' ? 'bg-rose-50/40 border-rose-100/80 text-rose-900' : 
+                      notif.type === 'success' ? 'bg-emerald-50/40 border-emerald-100/80 text-emerald-900' : 
+                      'bg-sky-50/40 border-sky-100/80 text-sky-900'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                      <span>{notif.type} Event</span>
+                      <span>
+                        {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <h4 className="font-extrabold text-xs text-slate-800 leading-snug">{notif.title}</h4>
+                    <p className="text-[11px] font-semibold leading-relaxed text-slate-600 mt-0.5">
+                      {notif.message}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12 text-slate-400 font-semibold text-xs uppercase tracking-wider">
+                  No active notifications
+                </div>
+              )}
             </div>
             
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-end">
+            <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-end flex-shrink-0">
               <button 
                 onClick={() => setShowNotifications(false)}
-                className={`px-5 py-2.5 rounded-xl font-bold text-xs cursor-pointer transition-colors shadow-sm focus:outline-none ${
-                  getNotificationContent().type === 'warning' ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/10' :
-                  getNotificationContent().type === 'info' ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-500/10' : 
-                  'bg-[#7D53F6] hover:bg-[#6C42E2] text-white shadow-[#7D53F6]/10'
-                }`}
+                className="px-5 py-2.5 bg-[#7D53F6] hover:bg-[#6C42E2] text-white rounded-xl font-bold text-xs cursor-pointer transition-colors shadow-sm focus:outline-none"
               >
                 Close
               </button>

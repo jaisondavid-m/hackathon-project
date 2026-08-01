@@ -9,6 +9,7 @@ import VenueManagement from '../pages/admin/VenueManagement';
 import OtpMapping from '../pages/admin/OtpMapping';
 import SessionDetails from '../pages/admin/SessionDetails';
 import AuditLogs from '../pages/admin/AuditLogs';
+import Notifications from '../pages/admin/Notifications';
 import FacultyDashboard from '../pages/faculty/FacultyDashboard';
 import FacultyDashboardView from '../pages/faculty/FacultyDashboardView';
 import OTPGeneration from '../pages/faculty/OTPGeneration';
@@ -48,6 +49,7 @@ function DashboardLayout({ user, onLogout }) {
     if (path.includes('/admin/otp-mapping')) return 'OTP Bounding Mapping';
     if (path.includes('/admin/session-details')) return 'Session Details';
     if (path.includes('/admin/audit-logs')) return 'Audit Logs';
+    if (path.includes('/admin/notifications')) return 'Notification Center';
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
     if (path.includes('/faculty/timetable')) return 'Time Table';
     if (path.includes('/faculty/my-attendance')) return 'My Attendance';
@@ -187,6 +189,7 @@ function App() {
             <Route path="otp-mapping" element={<OtpMapping />} />
             <Route path="session-details" element={<SessionDetails />} />
             <Route path="audit-logs" element={<AuditLogs />} />
+            <Route path="notifications" element={<Notifications />} />
             <Route path="profile" element={<StudentProfile />} />
           </Route>
         </Route>
