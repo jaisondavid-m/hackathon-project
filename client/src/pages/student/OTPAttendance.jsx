@@ -316,9 +316,8 @@ function OTPAttendance() {
     const s = (secs % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   };
-
   return (
-    <div className="w-full flex flex-col justify-center items-center py-1 relative overflow-hidden">
+    <div className="w-full flex-grow flex flex-col justify-center items-center py-6 relative overflow-hidden">
       {/* Blurred circles for depth */}
       <div className="absolute top-[-10%] left-[-10%] w-[30%] h-[30%] rounded-full bg-[#4F46E5]/5 blur-[80px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-[#7C3AED]/5 blur-[80px] pointer-events-none" />
