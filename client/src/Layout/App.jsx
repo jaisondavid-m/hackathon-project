@@ -10,6 +10,7 @@ import OtpMapping from '../pages/admin/OtpMapping';
 import SessionDetails from '../pages/admin/SessionDetails';
 import AuditLogs from '../pages/admin/AuditLogs';
 import FacultyDashboard from '../pages/faculty/FacultyDashboard';
+import FacultyDashboardView from '../pages/faculty/FacultyDashboardView';
 import OTPGeneration from '../pages/faculty/OTPGeneration';
 import FacultyTimeTable from '../pages/faculty/FacultyTimeTable';
 import FacultyAttendance from '../pages/faculty/FacultyAttendance';
@@ -192,7 +193,8 @@ function App() {
         {/* Faculty routes */}
         <Route element={<ProtectedRoute user={user} allowedRole="faculty" />}>
           <Route path="/faculty" element={<FacultyDashboard />}>
-            <Route index element={<Navigate to="otp" replace />} />
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<FacultyDashboardView />} />
             <Route path="otp" element={<OTPGeneration />} />
             <Route path="timetable" element={<FacultyTimeTable />} />
             <Route path="my-attendance" element={<FacultyAttendance />} />

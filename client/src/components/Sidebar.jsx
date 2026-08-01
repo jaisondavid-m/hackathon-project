@@ -17,6 +17,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     if (path.includes('/admin/otp-mapping')) return 'otp-mapping';
     if (path.includes('/admin/audit-logs')) return 'audit';
     if (path.includes('/admin/profile')) return 'admin-profile';
+    if (path.includes('/faculty/dashboard')) return 'faculty-dashboard';
     if (path.includes('/faculty/otp')) return 'otp';
     if (path.includes('/faculty/timetable')) return 'timetable';
     if (path.includes('/faculty/my-attendance')) return 'my-attendance';
@@ -41,7 +42,8 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
       { id: 'admin-profile', path: '/admin/profile', label: 'Profile', icon: User },
     ],
     faculty: [
-      { id: 'otp', path: '/faculty/otp', label: 'Attendance', icon: ClipboardList },
+      { id: 'faculty-dashboard', path: '/faculty/dashboard', label: 'Dashboard', icon: Layers },
+      { id: 'otp', path: '/faculty/otp', label: 'OTP Generation', icon: ClipboardList },
       { id: 'timetable', path: '/faculty/timetable', label: 'Time Table', icon: Calendar },
       { id: 'my-attendance', path: '/faculty/my-attendance', label: 'My Attendance', icon: UserCheck },
       { id: 'faculty-profile', path: '/faculty/profile', label: 'Profile', icon: User },
