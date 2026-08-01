@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # 1. Database Container (MySQL 8.0)
+  mysql:
+    image: mysql:8.0
+    container_name: pcdp-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: jaison_db_password
+      MYSQL_DATABASE: hackathon_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p", "jaison_db_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Go API Backend Container
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: pcdp-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      JWT_SECRET: supersecretkey
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: jaison_db_password
+      DB_NAME: hackathon_db
+      DB_TLS: "false"
+      # SMTP details can be filled here or inside .env file loaded by compose
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USER: 
+      SMTP_PASSWORD: 
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # 3. Nginx Web Server serving React Frontend
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: pcdp-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

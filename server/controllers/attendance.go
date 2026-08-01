@@ -200,21 +200,41 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 		return
 	}
 
-	// Geolocation Bounding Check
-	if req.Latitude == 0.0 && req.Longitude == 0.0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Geolocation coordinates are required to mark attendance. Please enable location services."})
-		return
-	}
-
 	var venue models.Venue
-	if err := ac.DB.First(&venue, session.VenueID).Error; err != nil {
+	if err := ac.DB.Preload("Routers").First(&venue, session.VenueID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve mapped venue configuration"})
 		return
 	}
 
-	if !isPointInQuadrilateral(req.Latitude, req.Longitude, venue) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You are outside the mapped venue boundaries. Attendance denied."})
+	// 1. WiFi Router IP Check
+	studentIP := c.ClientIP()
+	matchesWifi := false
+	for _, r := range venue.Routers {
+		if studentIP == r.IPAddress {
+			matchesWifi = true
+			break
+		}
+	}
+
+	// 2. Geofencing check
+	geofenceOk := false
+	if req.Latitude != 0.0 || req.Longitude != 0.0 {
+		geofenceOk = isPointInQuadrilateral(req.Latitude, req.Longitude, venue)
+	}
+
+	// 3. Validation Logic: EITHER must be true
+	if !matchesWifi && !geofenceOk {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "Attendance Denied: You are neither connected to the venue's WiFi network nor within the geofenced classroom boundaries.",
+		})
 		return
+	}
+
+	validationMethod := "Geofencing Boundary Check"
+	if matchesWifi {
+		validationMethod = "WiFi Network Connection (IP: " + studentIP + ")"
+	} else if geofenceOk {
+		validationMethod = "Geofencing Boundary Check (Lat/Lon: " + fmt.Sprintf("%.6f, %.6f", req.Latitude, req.Longitude) + ")"
 	}
 
 	// Check if attendance is already logged for this session
@@ -258,7 +278,7 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 		studentEmail.(string),
 		studentRole.(string),
 		"Attendance Marked",
-		"Marked present for class "+record.ClassID+" - Hour "+fmt.Sprintf("%d", record.HourNumber)+" at venue "+venue.Name,
+		"Marked present for class "+record.ClassID+" - Hour "+fmt.Sprintf("%d", record.HourNumber)+" at venue "+venue.Name+" via "+validationMethod,
 		c.ClientIP(),
 	)
 
