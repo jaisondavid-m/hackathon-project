@@ -1,6 +1,8 @@
-# PCDP 4.0 — Smart Bounding Attendance Console
+# Attendance Monitoring with QR Code Check-in
 
-PCDP 4.0 is an intelligent, high-trust classroom attendance system designed to eliminate "proxy" attendance and check-in manipulation. By combining location verification, local campus network validation, and expiring security keys, the system guarantees that attendance can only be marked by students physically present in the classroom.
+### 🚀 Hackathon Project Reference
+
+**Attendance Monitoring with QR Code Check-in** is an intelligent, high-trust classroom attendance system designed to eliminate "proxy" attendance and check-in manipulation. By combining location verification, local campus network validation, and secure cryptographic handshakes, the system guarantees that attendance can only be marked by students physically present in the classroom.
 
 ---
 
@@ -12,9 +14,9 @@ Traditional classroom attendance methods—and even basic digital barcode/OTP sy
 
 ---
 
-## 🛡️ Our Solution: How PCDP 4.0 Solves Attendance Exploits
+## 🛡️ Our Solution: How it Solves Attendance Exploits
 
-PCDP 4.0 solves the proxy problem by enforcing **Double-Lock Verification** using location boundaries and local WiFi connections.
+This system solves the proxy problem by enforcing **Double-Lock Verification** using location boundaries, local WiFi connections, and request security mechanisms.
 
 ### 1. Hybrid "OR" Verification
 To successfully submit an attendance code, the system validates the student using two independent checks. **If either validation is successful, attendance is marked:**
@@ -23,11 +25,21 @@ To successfully submit an attendance code, the system validates the student usin
 
 *Why this works:* A student sitting in the hostel cannot mark attendance because they are outside the classroom coordinates and not connected to that room's specific WiFi router—even if a friend sends them the OTP code.
 
-### 2. Time-Restricted Sessions (5-Min Expiry)
-Attendance codes are dynamically generated and expire automatically after 5 minutes. This creates a small window of opportunity that prevents sharing codes for later use.
+### 2. Time-Restricted Sessions (7 Seconds Expiry)
+Attendance codes are dynamically generated and expire automatically after 7 seconds. This creates a tiny window of opportunity that prevents sharing codes for later use.
+
+### Hashed OTP Verification
+To prevent students from sniffing/monitoring HTTP request payloads and manually marking attendance using external platforms like Postman, the system employs a secure hashing algorithm. 
+* **Client-Side Hashing**: The student's device hashes the OTP code before transmitting it.
+* **Backend Validation**: The Go backend verifies and validates the hashed value rather than raw texts, blocking requests from being intercepted and replayed manually.
 
 ### 3. Clear Verification Audits
 Administrative panels log exactly how each student was verified (e.g., *"Verified via classroom WiFi Router (IP: 192.168.1.10)"* or *"Verified via Geofence GPS Coordinates"*). This creates a high-trust verification trail.
+
+### 4. Admin Threat Notifications & Logs
+If any user attempts to perform unauthorized actions repeatedly (again and again), the system automatically acts to flag the behavior:
+* **Admin Notifications & Mail**: The system triggers real-time alerts and dispatches emails to the administrator using the Go backend's `gomail` integration.
+* **Audit Inspection**: Admins can instantly review the logs to trace the actor's history, specific actions, timestamps, and client IP addresses.
 
 ---
 
@@ -36,7 +48,7 @@ Administrative panels log exactly how each student was verified (e.g., *"Verifie
 ### For Faculty Staff
 1. **Start Session**: Select the class hour on the dashboard.
 2. **Display Code**: The system displays a unique, secure OTP code alongside a solid black QR Code.
-3. **Automatic Expiry**: The code remains active for 5 minutes and then deactivates.
+3. **Automatic Expiry**: The code remains active for the configured period and then deactivates.
 
 ### For Students
 1. **Scan QR Code**: Open the console on a mobile browser and scan the classroom QR code.
@@ -56,7 +68,8 @@ While the user experience is kept simple and non-technical, the backend runs on 
 
 ### Backend (API Services & Security)
 * **Go (Golang)**: High-performance, statically typed API backend utilizing the Gin router.
-* **GORM (Go Object Relational Mapper)**: Handles query mappings, secure transactions, and relational user models.
+* **MySQL Database**: A robust database engine chosen for storing relationships and logs.
+* **GORM (Go Object Relational Mapper)**: Controls the MySQL database connections for better performance, handling transactions, relationships, and schema migrations.
 * **Gomail & SMTP**: Dispatches styled HTML email notifications to registered accounts.
 * **Mathematical Bounding Checks**: Runs a ray-casting polygon mathematical check to determine if coordinate points fall inside the classroom boundaries.
 
