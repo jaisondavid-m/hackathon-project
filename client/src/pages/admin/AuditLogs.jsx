@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  LogIn, GraduationCap, Award, AlertCircle, Search, Filter, Calendar, ChevronLeft, ChevronRight, RefreshCw 
+  LogIn, GraduationCap, Award, AlertCircle, Search, Filter, Calendar, ChevronLeft, ChevronRight, RefreshCw,
+  FileSpreadsheet, FileText
 } from 'lucide-react';
 import { auditService } from '../../api/audit';
 
@@ -117,6 +118,90 @@ function AuditLogs() {
       auditCurrentPage * itemsPerPage
     );
   }, [filteredLogs, auditCurrentPage]);
+
+  // Export Functions
+  const exportToExcel = () => {
+    // Create CSV headers
+    const headers = ['Timestamp', 'Actor Email', 'Actor Role', 'Action', 'IP Address', 'Details'];
+    const rows = filteredLogs.map(log => [
+      new Date(log.created_at).toLocaleString(),
+      log.actor_email || '',
+      log.actor_role || '',
+      log.action || '',
+      log.ip_address || '',
+      (log.details || '').replace(/"/g, '""') // Escape quotes for CSV
+    ]);
+    
+    // Construct CSV content with BOM for proper Excel UTF-8 decoding
+    const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(e => e.map(val => `"${val}"`).join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `audit_log_report_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToPDF = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow popups to download PDF reports.');
+      return;
+    }
+    const logRowsHtml = filteredLogs.map(log => `
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; font-size: 11px;">${new Date(log.created_at).toLocaleString()}</td>
+        <td style="padding: 8px; border: 1px solid #ddd; font-size: 11px;">${log.actor_email || ''}</td>
+        <td style="padding: 8px; border: 1px solid #ddd; font-size: 11px; text-transform: uppercase;">${log.actor_role || ''}</td>
+        <td style="padding: 8px; border: 1px solid #ddd; font-size: 11px;">${log.action || ''}</td>
+        <td style="padding: 8px; border: 1px solid #ddd; font-size: 11px;">${log.ip_address || ''}</td>
+        <td style="padding: 8px; border: 1px solid #ddd; font-size: 11px;">${log.details || ''}</td>
+      </tr>
+    `).join('');
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Audit Log Report</title>
+          <style>
+            body { font-family: sans-serif; padding: 20px; color: #333; }
+            h1 { font-size: 20px; margin-bottom: 5px; }
+            p { font-size: 12px; margin-bottom: 20px; color: #666; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th { background-color: #f3f4f6; padding: 10px; text-align: left; font-size: 12px; border: 1px solid #ddd; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <h1>PCDP 4.0 - Audit Log Report</h1>
+          <p>Generated on: ${new Date().toLocaleString()} | Total Records: ${filteredLogs.length}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Actor Email</th>
+                <th>Role</th>
+                <th>Action</th>
+                <th>IP Address</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${logRowsHtml}
+            </tbody>
+          </table>
+          <script>
+            window.onload = function() {
+              window.print();
+              window.close();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
 
   // Helper Functions
   const getInitials = (email) => {
@@ -323,6 +408,28 @@ function AuditLogs() {
                 }}
                 className="bg-transparent border-none text-[11px] font-bold text-slate-600 focus:outline-none focus:ring-0 p-0"
               />
+            </div>
+
+            {/* Export Buttons */}
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button
+                onClick={exportToExcel}
+                disabled={filteredLogs.length === 0}
+                title="Export Filtered Logs to Excel"
+                className="flex items-center gap-1.5 border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus:outline-none"
+              >
+                <FileSpreadsheet size={13} />
+                <span>Download Excel</span>
+              </button>
+              <button
+                onClick={exportToPDF}
+                disabled={filteredLogs.length === 0}
+                title="Export Filtered Logs to PDF"
+                className="flex items-center gap-1.5 border border-rose-200 bg-rose-50/50 hover:bg-rose-50 text-rose-700 px-3 py-1.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus:outline-none"
+              >
+                <FileText size={13} />
+                <span>Download PDF</span>
+              </button>
             </div>
           </div>
 

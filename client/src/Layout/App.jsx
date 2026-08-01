@@ -183,7 +183,7 @@ function App() {
         {/* Admin routes */}
         <Route element={<ProtectedRoute user={user} allowedRole="admin" />}>
           <Route path="/admin">
-            <Route index element={<Navigate to="users" replace />} />
+            <Route index element={<Navigate to="venues" replace />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="venues" element={<VenueManagement />} />
             <Route path="otp-mapping" element={<OtpMapping />} />
