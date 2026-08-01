@@ -300,7 +300,7 @@ function UserManagement() {
       {/* 4. MODAL DIALOG POPUP */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-[480px] overflow-hidden animate-zoomIn">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-[480px] overflow-hidden animate-zoomIn flex flex-col max-h-[90vh]">
             <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-[#7D53F6]/10 text-[#7D53F6] rounded-lg">
@@ -320,7 +320,7 @@ function UserManagement() {
               </button>
             </div>
 
-            <form onSubmit={handleUserSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleUserSubmit} className="p-6 space-y-5 overflow-y-auto flex-grow">
               {formError && (
                 <div className="p-3.5 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-2.5 text-rose-700 text-xs font-semibold">
                   <AlertCircle className="flex-shrink-0 mt-0.5" size={15} />

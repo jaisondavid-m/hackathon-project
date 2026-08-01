@@ -280,7 +280,7 @@ function VenueManagement() {
       {/* boundary creation/edit modal popup */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-[580px] overflow-hidden animate-zoomIn">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-[580px] overflow-hidden animate-zoomIn flex flex-col max-h-[90vh]">
             <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-[#7D53F6]/10 text-[#7D53F6] rounded-lg">
@@ -303,7 +303,7 @@ function VenueManagement() {
               </button>
             </div>
 
-            <form onSubmit={handleVenueSubmit} className="flex flex-col">
+            <form onSubmit={handleVenueSubmit} className="flex flex-col overflow-y-auto flex-grow">
               <div className="p-6 pb-0 space-y-4">
                 {formError && (
                   <div className="p-3.5 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-2.5 text-rose-700 text-xs font-semibold">
@@ -523,7 +523,7 @@ function VenueManagement() {
       {/* Coordinates Detail Modal */}
       {coordsDetailVenue && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-[420px] overflow-hidden animate-zoomIn">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-[420px] overflow-hidden animate-zoomIn flex flex-col max-h-[90vh]">
             <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
@@ -541,7 +541,7 @@ function VenueManagement() {
                 <X size={18} />
               </button>
             </div>
-            <div className="p-6 space-y-3">
+            <div className="p-6 space-y-3 overflow-y-auto flex-grow">
               {[1, 2, 3, 4].map((n) => (
                 <div key={n} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-2xl">
                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Corner {n}</span>
@@ -571,7 +571,7 @@ function VenueManagement() {
       {/* Router IPs Detail Modal */}
       {routerDetailVenue && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-[420px] overflow-hidden animate-zoomIn">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-[420px] overflow-hidden animate-zoomIn flex flex-col max-h-[90vh]">
             <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-[#7D53F6]/10 text-[#7D53F6] rounded-lg">
@@ -591,7 +591,7 @@ function VenueManagement() {
                 <X size={18} />
               </button>
             </div>
-            <div className="p-6 space-y-2">
+            <div className="p-6 space-y-2 overflow-y-auto flex-grow">
               {(routerDetailVenue.routers || []).length > 0 ? (
                 (routerDetailVenue.routers || []).map((r, i) => (
                   <div key={r.id || i} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-2xl">

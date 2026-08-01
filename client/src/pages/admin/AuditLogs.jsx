@@ -302,7 +302,7 @@ function AuditLogs() {
             </div>
 
             {/* Date Filters */}
-            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-500">
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-500 w-full sm:w-auto">
               <Calendar size={12} className="text-slate-400" />
               <input
                 type="date"
@@ -529,7 +529,7 @@ function AuditLogs() {
       {/* Details inspection dialog modal */}
       {selectedAuditLog && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
             <div className="p-5 border-b border-slate-100 flex items-center justify-between">
               <h3 className="font-bold text-slate-800 text-base">Activity Log Details</h3>
               <button
@@ -539,7 +539,7 @@ function AuditLogs() {
                 &times;
               </button>
             </div>
-            <div className="p-6 space-y-4 text-xs font-semibold text-slate-600">
+            <div className="p-6 space-y-4 text-xs font-semibold text-slate-600 overflow-y-auto flex-grow">
               <div className="grid grid-cols-3 py-1.5 border-b border-slate-50">
                 <span className="text-slate-400">Actor Email</span>
                 <span className="col-span-2 text-slate-800">{selectedAuditLog.actor_email}</span>

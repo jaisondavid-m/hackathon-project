@@ -473,7 +473,7 @@ function OTPGeneration() {
                     </div>
                   </div>
 
-                  <div className="flex flex-row items-center justify-center gap-6 my-4 w-full">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 my-4 w-full">
                     {/* QR Code Container */}
                     <div className={`p-2 rounded-2xl border transition-all duration-200 flex-shrink-0 bg-white ${
                       activeSession ? 'border-[#7D53F6]/20' : 'border-slate-100'
