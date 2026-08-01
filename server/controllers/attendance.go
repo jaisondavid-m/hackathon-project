@@ -229,6 +229,13 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 	}
 
 	// Create Attendance Record
+	// Fetch the faculty name who created this OTP session
+	var faculty models.User
+	facultyDisplayName := "Faculty"
+	if err := ac.DB.First(&faculty, session.FacultyID).Error; err == nil {
+		facultyDisplayName = faculty.Name
+	}
+
 	record := models.AttendanceRecord{
 		StudentID:   studentID,
 		StudentName: student.Name,
@@ -236,6 +243,7 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 		HourNumber:  session.HourNumber,
 		Date:        session.Date,
 		Status:      "present",
+		FacultyName: facultyDisplayName,
 	}
 
 	if err := ac.DB.Create(&record).Error; err != nil {

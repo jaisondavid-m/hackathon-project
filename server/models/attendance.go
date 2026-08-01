@@ -29,6 +29,7 @@ type AttendanceRecord struct {
 	HourNumber  int            `gorm:"not null" json:"hour_number"`
 	Date        string         `gorm:"size:20;not null" json:"date"` // Format: YYYY-MM-DD
 	Status      string         `gorm:"size:50;default:'present'" json:"status"`
+	FacultyName string         `gorm:"size:255" json:"faculty_name"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`

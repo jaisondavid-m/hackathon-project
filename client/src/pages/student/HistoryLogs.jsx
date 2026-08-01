@@ -29,23 +29,11 @@ function HistoryLogs({ records }) {
     return timeLabels[hourNumber] || '';
   };
 
-  const getMarkedByLabel = (hourNumber, status) => {
-    if (status === 'absent') {
+  const getMarkedByLabel = (record) => {
+    if (record.status === 'absent') {
       return 'System Auto-Absence';
     }
-    // Professional and varied simulation of marking methods
-    switch (hourNumber) {
-      case 1:
-      case 5:
-        return 'Student (OTP Verification)';
-      case 2:
-      case 6:
-        return 'Student (QR Scan)';
-      case 3:
-        return 'Biometric Fingerprint';
-      default:
-        return 'Faculty Portal (Manual)';
-    }
+    return record.faculty_name || 'Faculty';
   };
 
   const getStatusBadge = (status) => {
@@ -103,7 +91,7 @@ function HistoryLogs({ records }) {
                   </span>
                   <span>&bull;</span>
                   <span className="text-slate-500">
-                    Marked by: <span className="font-extrabold text-slate-600">{getMarkedByLabel(item.hour_number, item.status)}</span>
+                    Marked by: <span className="font-extrabold text-slate-600">{getMarkedByLabel(item)}</span>
                   </span>
                 </div>
               </div>
