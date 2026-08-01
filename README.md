@@ -43,6 +43,62 @@ If any user attempts to perform unauthorized actions repeatedly (again and again
 
 ---
 
+## 👥 Roles & Feature List
+
+The console supports three distinct roles (Admin, Faculty, and Student) with role-specific workspaces and workflows.
+
+### 1. System Administrator Dashboard
+The Admin console provides full system configuration and monitoring capabilities:
+* **User Management**:
+  * Create new user accounts (Admin, Faculty, or Student).
+  * Lock or Unlock accounts dynamically (Blocked accounts are instantly denied database login).
+  * Monitor users' last sign-in timestamps.
+* **Venue & Geofence Management**:
+  * Set up campus venues (classrooms, auditoriums, lecture halls).
+  * Configure 4-point geofence coordinate boundaries (latitude and longitude vertices) for each room.
+  * Register router IP addresses mapped to each venue to enable local WiFi check-ins.
+* **OTP Mapping Console**:
+  * Bind a Faculty member to a specific Class, Hour, and Venue.
+  * Pre-register student email lists to that class segment, establishing the target attendance group.
+* **Audit Logs Panel**:
+  * View system-wide action logs (login attempts, attendance submissions, user locks, session creations).
+  * Filter audit history logs by actors, actions, or date ranges.
+  * Inspect IP addresses and audit detail logs.
+* **Notification Center (Send Notifications)**:
+  * Compose text notifications with customizable titles, descriptions, and severity categories (Info, Warning, Alert, Success).
+  * Target audience scopes: Broadcast (Everyone), All Faculty, All Students, or Specific Individual email addresses.
+  * Dispatches dynamic alerts to target users' in-app notification widgets and triggers email notifications via the Go server's SMTP helper.
+
+### 2. Faculty Dashboard
+The Faculty console enables class management and live session generation:
+* **Attendance Session Creation**:
+  * Start attendance sessions for mapped classes during specific class hours.
+  * Generates dynamic OTP codes and solid black QR Codes.
+  * Manages active check-in durations (defaulting to 5-minute lifetimes).
+* **Timetable Mappings**:
+  * View mapped timetable configurations, assigning hours, rooms, and student counts.
+* **Class Logs**:
+  * View student check-in details.
+  * Monitor real-time present lists and tracking metrics.
+* **Profile**:
+  * Custom welcoming profile dashboard detailing department, designative title, and qualifications.
+
+### 3. Student Dashboard
+The Student console offers quick and secure attendance marking:
+* **Mark Attendance**:
+  * Scan projected class QR codes directly via mobile camera streams.
+  * Enter OTP keys with location services enabled.
+  * The system performs background geolocation checks and verifies local campus network IP configurations.
+* **Attendance Stats**:
+  * View present/late statistics and active subject percentage lists.
+  * Check warnings if overall attendance values fall below required thresholds (e.g. 80%).
+* **Attendance History**:
+  * View chronological lists of logged attendance marks, including timestamps, class hours, and faculty supervisors.
+* **Profile**:
+  * Premium glassmorphic card display displaying register numbers, batches, departments, semesters, and mapped faculty advisors.
+
+---
+
 ## 🔄 User Workflow: How it Works
 
 ### For Faculty Staff
@@ -76,3 +132,50 @@ While the user experience is kept simple and non-technical, the backend runs on 
 ### Infrastructure & Deployment
 * **Docker & Docker Compose**: Containerizes the MySQL database, Go backend, and Nginx frontend for reliable, single-command installations.
 * **Caddy Server**: Serves as a reverse proxy, managing SSL/TLS certificates and routing traffic securely.
+
+---
+
+## ⚙️ Running Locally
+
+### Prerequisites
+* Go (1.23 or later)
+* Node.js (v18 or later)
+* MySQL Server (optional, defaults to cloud Serverless TiDB deployment)
+
+### 1. Server Configuration
+Navigate to the server directory:
+```bash
+cd server
+```
+Create a `.env` file or fill in the template:
+```env
+PORT=8080
+JWT_SECRET=supersecretkey
+DB_HOST=gateway01.ap-southeast-1.prod.aws.tidbcloud.com
+DB_PORT=4000
+DB_USER=root
+DB_PASSWORD=password
+DB_NAME=test
+```
+Start the backend server:
+```bash
+go run main.go
+```
+
+### 2. Client Configuration
+Navigate to the client directory:
+```bash
+cd client
+```
+Install dependencies and launch the developer workspace:
+```bash
+npm install
+npm run dev
+```
+
+### 3. Running with Docker Compose
+To run the entire containerized MySQL, Go, and Nginx stack locally:
+```bash
+docker compose up --build
+```
+The client console will be exposed on port `80`, and backend APIs will run on port `8080`.
