@@ -18,6 +18,21 @@ export const authService = {
   },
 
   /**
+   * Logs in a user via Google Sign-In
+   * @param {string} idToken Google ID Token
+   */
+  async loginGoogle(idToken) {
+    const response = await api.post('/login/google', { id_token: idToken });
+    const { token, user } = response.data;
+    
+    // Save to localStorage
+    localStorage.setItem('pcdp_token', token);
+    localStorage.setItem('pcdp_user', JSON.stringify(user));
+    
+    return user;
+  },
+
+  /**
    * Fetches current user profile
    */
   async getProfile() {

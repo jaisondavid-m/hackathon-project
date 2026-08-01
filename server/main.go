@@ -56,6 +56,7 @@ func main() {
 
 	// Public Routes
 	r.POST("/api/login", authController.Login)
+	r.POST("/api/login/google", authController.LoginGoogle)
 
 	// Protected Routes (Required Authentication)
 	protected := r.Group("/api")
