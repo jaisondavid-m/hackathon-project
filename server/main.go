@@ -31,6 +31,7 @@ func main() {
 	attendanceController := controllers.NewAttendanceController(db)
 	venueController := controllers.NewVenueController(db)
 	auditController := controllers.NewAuditController(db)
+	notificationController := controllers.NewNotificationController(db)
 
 	// Set up router
 	r := gin.Default()
@@ -98,6 +99,7 @@ func main() {
 			adminOnly.POST("/otp-mappings", configController.CreateOtpMapping)
 			adminOnly.DELETE("/otp-mappings/:id", configController.DeleteOtpMapping)
 			adminOnly.GET("/audit-logs", auditController.GetAuditLogs)
+			adminOnly.POST("/notifications/send-email", notificationController.SendNotificationEmail)
 		}
 	}
 

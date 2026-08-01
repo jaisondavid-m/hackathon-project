@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { authService } from '../../api/auth';
 import InputField from '../../components/InputField';
+import api from '../../api/axios';
 
 function Notifications() {
   const [users, setUsers] = useState([]);
@@ -83,7 +84,7 @@ function Notifications() {
     }
   };
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     setFormError('');
     setFormSuccess('');
@@ -100,37 +101,53 @@ function Notifications() {
 
     setFormLoading(true);
 
-    setTimeout(() => {
-      try {
-        const newNotif = {
-          id: `notif-${Date.now()}`,
-          title: title.trim(),
-          message: message.trim(),
-          type,
-          target: targetScope,
-          targetEmail: targetScope === 'user' ? selectedUserEmail : '',
-          createdAt: new Date().toISOString()
-        };
+    try {
+      // 1. Send email through Go backend API (uses gomail package)
+      const payload = {
+        title: title.trim(),
+        message: message.trim(),
+        type: type,
+        target: targetScope,
+        targetEmail: targetScope === 'user' ? selectedUserEmail : ''
+      };
 
-        const updatedList = [newNotif, ...sentNotifications];
-        localStorage.setItem('pcdp_notifications', JSON.stringify(updatedList));
-        setSentNotifications(updatedList);
+      const response = await api.post('/admin/notifications/send-email', payload);
+      const { email_success, sent_count } = response.data;
 
-        setFormSuccess('Notification dispatched successfully!');
-        
-        // Reset form details
-        setTitle('');
-        setMessage('');
-        setType('info');
-        setTargetScope('all');
-        setSelectedUserEmail('');
-        setUserSearchTerm('');
-      } catch (err) {
-        setFormError('Failed to dispatch notification.');
-      } finally {
-        setFormLoading(false);
+      // 2. Register notification in local UI store
+      const newNotif = {
+        id: `notif-${Date.now()}`,
+        title: title.trim(),
+        message: message.trim(),
+        type,
+        target: targetScope,
+        targetEmail: targetScope === 'user' ? selectedUserEmail : '',
+        createdAt: new Date().toISOString()
+      };
+
+      const updatedList = [newNotif, ...sentNotifications];
+      localStorage.setItem('pcdp_notifications', JSON.stringify(updatedList));
+      setSentNotifications(updatedList);
+
+      if (email_success) {
+        setFormSuccess(`Notification dispatched and emailed to ${sent_count} user(s) successfully!`);
+      } else {
+        setFormSuccess(`Notification saved locally. Note: Email dispatcher was simulated (SMTP not configured).`);
       }
-    }, 600);
+      
+      // Reset form details
+      setTitle('');
+      setMessage('');
+      setType('info');
+      setTargetScope('all');
+      setSelectedUserEmail('');
+      setUserSearchTerm('');
+    } catch (err) {
+      console.error(err);
+      setFormError(err.response?.data?.error || 'Failed to dispatch notification email via backend.');
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   const handleDelete = (id) => {
