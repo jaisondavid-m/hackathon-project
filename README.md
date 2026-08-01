@@ -165,6 +165,14 @@ refer: https://dbdiagram.io/d/6a6c3f0bc3a90dd98df5c553
 
 ---
 
+## 🎨 UI/UX Design (Figma)
+
+> The complete UI/UX design prototype was crafted in Figma, covering all role-based dashboards (Admin, Faculty, Student) and user flows:
+>
+> 🔗 **[View Figma Design – TEAM DYNAMICS](https://www.figma.com/design/mKhML6UidHn7HS4MexHyVF/TEAM-DYNAMICS?node-id=0-1)**
+
+---
+
 ## 🛠️ Technical Stack & Skills Used
 
 While the user experience is kept simple and non-technical, the backend runs on a highly modern development stack:
@@ -234,3 +242,7 @@ To run the entire containerized MySQL, Go, and Nginx stack locally:
 docker compose up --build
 ```
 The client console will be exposed on port `80`, and backend APIs will run on port `8080`.
+
+
+for overview , view this docs drive
+https://drive.google.com/file/d/1TUOYvGUh_EhXUFqpBDrns-k0nHR1PaIc/view?usp=sharing
