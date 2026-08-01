@@ -51,6 +51,7 @@ function DashboardLayout({ user, onLogout }) {
     if (path.includes('/faculty/my-attendance')) return 'My Attendance';
     if (path.includes('/student/otp')) return 'Mark Attendance';
     if (path.includes('/student/history')) return 'Attendance History';
+    if (path.includes('/profile')) return 'Profile Overview';
     return 'Dashboard';
   };
 
@@ -177,6 +178,7 @@ function App() {
             <Route path="otp-mapping" element={<OtpMapping />} />
             <Route path="session-details" element={<SessionDetails />} />
             <Route path="audit-logs" element={<AuditLogs />} />
+            <Route path="profile" element={<StudentProfile />} />
           </Route>
         </Route>
 
@@ -187,6 +189,7 @@ function App() {
             <Route path="otp" element={<OTPGeneration />} />
             <Route path="timetable" element={<FacultyTimeTable />} />
             <Route path="my-attendance" element={<FacultyAttendance />} />
+            <Route path="profile" element={<StudentProfile />} />
           </Route>
         </Route>
 

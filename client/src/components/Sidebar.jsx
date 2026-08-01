@@ -16,9 +16,11 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     if (path.includes('/admin/session-details')) return 'session-details';
     if (path.includes('/admin/otp-mapping')) return 'otp-mapping';
     if (path.includes('/admin/audit-logs')) return 'audit';
+    if (path.includes('/admin/profile')) return 'admin-profile';
     if (path.includes('/faculty/otp')) return 'otp';
     if (path.includes('/faculty/timetable')) return 'timetable';
     if (path.includes('/faculty/my-attendance')) return 'my-attendance';
+    if (path.includes('/faculty/profile')) return 'faculty-profile';
     if (path.includes('/student/otp')) return 'student-otp';
     if (path.includes('/student/history')) return 'student-history';
     if (path.includes('/student/profile')) return 'student-profile';
@@ -35,11 +37,13 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
       { id: 'session-details', path: '/admin/session-details', label: 'Session Details', icon: Clock },
       { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', icon: Layers },
       { id: 'users', path: '/admin/users', label: 'Users Management', icon: Users },
+      { id: 'admin-profile', path: '/admin/profile', label: 'Profile', icon: User },
     ],
     faculty: [
       { id: 'otp', path: '/faculty/otp', label: 'Attendance', icon: ClipboardList },
       { id: 'timetable', path: '/faculty/timetable', label: 'Time Table', icon: Calendar },
       { id: 'my-attendance', path: '/faculty/my-attendance', label: 'My Attendance', icon: UserCheck },
+      { id: 'faculty-profile', path: '/faculty/profile', label: 'Profile', icon: User },
     ],
     student: [
       { id: 'student-otp', path: '/student/otp', label: 'Mark Attendance', icon: UserCheck },

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useOutletContext } from 'react-router-dom';
 
 function FacultyDashboard() {
+  const parentContext = useOutletContext() || {};
   const [selectedClass, setSelectedClass] = useState('CS101');
 
   const classes = [
@@ -12,7 +13,7 @@ function FacultyDashboard() {
 
   return (
     <div className="w-full">
-      <Outlet context={{ selectedClass, setSelectedClass, classes }} />
+      <Outlet context={{ ...parentContext, selectedClass, setSelectedClass, classes }} />
     </div>
   );
 }

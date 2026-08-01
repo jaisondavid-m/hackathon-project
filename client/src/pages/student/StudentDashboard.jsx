@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useOutletContext } from 'react-router-dom';
 import { attendanceService } from '../../api/attendance';
 
 function StudentDashboard() {
+  const parentContext = useOutletContext() || {};
   const [records, setRecords] = useState([]);
   const [stats, setStats] = useState({ total: 0, present: 0, late: 0 });
   const [loading, setLoading] = useState(true);
@@ -36,7 +37,7 @@ function StudentDashboard() {
   }
 
   return (
-    <Outlet context={{ records, stats, fetchStudentAttendance }} />
+    <Outlet context={{ ...parentContext, records, stats, fetchStudentAttendance }} />
   );
 }
 

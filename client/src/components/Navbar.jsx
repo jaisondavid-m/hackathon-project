@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Bell, ChevronDown, LogOut, Menu } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Bell, ChevronDown, LogOut, Menu, User } from 'lucide-react';
 
 function Navbar({ user, onLogout, toggleMobileSidebar }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   if (!user) return null;
@@ -20,6 +21,7 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
     if (path.includes('/faculty/my-attendance')) return 'My Attendance';
     if (path.includes('/student/otp')) return 'Mark Attendance';
     if (path.includes('/student/history')) return 'Attendance History';
+    if (path.includes('/profile')) return 'Profile Overview';
     return 'Dashboard';
   };
 
@@ -95,7 +97,17 @@ function Navbar({ user, onLogout, toggleMobileSidebar }) {
           {profileDropdownOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn">
+              <div className="absolute right-0 mt-2 w-52 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn">
+                <button
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    navigate(`/${user.role}/profile`);
+                  }}
+                  className="w-full text-left px-4 py-2.5 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer border-b border-slate-100"
+                >
+                  <User size={16} className="text-[#7D53F6]" />
+                  <span>View Profile</span>
+                </button>
                 <button
                   onClick={() => {
                     setProfileDropdownOpen(false);
