@@ -253,7 +253,7 @@ function OTPAttendance() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="w-full max-w-[420px] bg-white rounded-3xl border border-slate-200/60 shadow-lg p-5 sm:p-6 z-10 my-auto"
+        className="w-full max-w-[480px] bg-white rounded-[32px] border border-slate-200/60 shadow-xl p-6 sm:p-8 z-10 my-auto"
       >
         <AnimatePresence mode="wait">
           {!isVerified ? (
@@ -262,23 +262,23 @@ function OTPAttendance() {
               initial={{ opacity: 1 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="space-y-3"
+              className="space-y-4 sm:space-y-5"
             >
               {/* Back Button & Header Row */}
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => navigate('/student/history')}
-                  className="flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-[#4F46E5] transition-colors cursor-pointer group"
+                  className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-400 hover:text-[#4F46E5] transition-colors cursor-pointer group"
                 >
-                  <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
+                  <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
                   <span>Back</span>
                 </button>
 
                 <div className="flex items-center gap-1.5">
-                  <div className="p-1 bg-[#4F46E5]/10 text-[#4F46E5] rounded-lg">
-                    <Shield size={14} className="stroke-[2]" />
+                  <div className="p-1.5 bg-[#4F46E5]/10 text-[#4F46E5] rounded-xl">
+                    <Shield size={16} className="stroke-[2]" />
                   </div>
-                  <h2 className="text-sm font-extrabold text-slate-800 tracking-tight">
+                  <h2 className="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">
                     Verification Code
                   </h2>
                 </div>
@@ -289,9 +289,9 @@ function OTPAttendance() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="p-2 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs"
+                  className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-2xs"
                 >
-                  <AlertTriangle size={13} className="flex-shrink-0" />
+                  <AlertTriangle size={15} className="flex-shrink-0" />
                   <span>{submitError}</span>
                 </motion.div>
               )}
@@ -300,15 +300,15 @@ function OTPAttendance() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="p-2 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs"
+                  className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-2xs"
                 >
-                  <CheckCircle size={13} className="flex-shrink-0" />
+                  <CheckCircle size={15} className="flex-shrink-0" />
                   <span>{submitSuccess}</span>
                 </motion.div>
               )}
 
               {/* OTP Input Boxes */}
-              <div className="flex justify-center items-center gap-2 py-0.5">
+              <div className="flex justify-center items-center gap-2.5 sm:gap-3 py-1">
                 {otpValues.map((val, idx) => (
                   <motion.input
                     key={idx}
@@ -320,15 +320,15 @@ function OTPAttendance() {
                     onKeyDown={(e) => handleKeyDown(idx, e)}
                     onPaste={idx === 0 ? handlePaste : undefined}
                     disabled={submitLoading}
-                    className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-slate-200 rounded-xl text-center text-base sm:text-lg font-extrabold text-slate-800 transition-all focus:outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-[#4F46E5]/10 disabled:opacity-50"
+                    className="w-12 h-12 sm:w-14 sm:h-14 bg-white border-2 border-slate-200 rounded-2xl text-center text-lg sm:text-xl font-extrabold text-slate-800 transition-all focus:outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-[#4F46E5]/10 disabled:opacity-50"
                     whileFocus={{ scale: 1.04 }}
                   />
                 ))}
               </div>
 
               {/* Numeric Keypad with Dedicated Background Container */}
-              <div className="p-3 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                <div className="grid grid-cols-3 gap-1.5">
+              <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-xs">
+                <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'Clear', 0, 'Delete'].map((val) => {
                     const isSpecial = val === 'Clear' || val === 'Delete';
                     return (
@@ -337,7 +337,7 @@ function OTPAttendance() {
                         type="button"
                         onClick={() => handleKeypadPress(val)}
                         disabled={submitLoading}
-                        className={`h-9 sm:h-10 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center cursor-pointer transition-all border ${
+                        className={`h-11 sm:h-12 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center cursor-pointer transition-all border ${
                           isSpecial
                             ? 'bg-slate-50 border-slate-200/80 text-slate-500 hover:bg-slate-100'
                             : 'bg-white border-slate-200/60 text-slate-800 hover:bg-slate-50'
@@ -345,7 +345,7 @@ function OTPAttendance() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        {val === 'Delete' ? <Delete size={14} /> : <span>{val}</span>}
+                        {val === 'Delete' ? <Delete size={18} /> : <span>{val}</span>}
                       </motion.button>
                     );
                   })}
@@ -357,15 +357,15 @@ function OTPAttendance() {
                 type="button"
                 onClick={handleVerify}
                 disabled={submitLoading || otp.length !== 6}
-                className="w-full h-10 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white font-extrabold text-xs tracking-wider uppercase rounded-xl shadow-md shadow-[#4F46E5]/15 hover:shadow-lg hover:shadow-[#4F46E5]/25 cursor-pointer disabled:from-slate-100 disabled:to-slate-100 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full h-12 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase rounded-xl shadow-md shadow-[#4F46E5]/15 hover:shadow-lg hover:shadow-[#4F46E5]/25 cursor-pointer disabled:from-slate-100 disabled:to-slate-100 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
                 {submitLoading ? (
-                  <Loader2 size={15} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                 ) : (
                   <>
-                    <ShieldCheck size={15} />
+                    <ShieldCheck size={18} />
                     <span>Verify & Continue</span>
                   </>
                 )}
@@ -376,11 +376,11 @@ function OTPAttendance() {
                 type="button"
                 onClick={() => setShowScanner(true)}
                 disabled={submitLoading}
-                className="w-full h-9 bg-white border border-[#4F46E5]/30 text-[#4F46E5] hover:bg-[#4F46E5]/5 font-bold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                className="w-full h-11 bg-white border border-[#4F46E5]/30 text-[#4F46E5] hover:bg-[#4F46E5]/5 font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl cursor-pointer transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
-                <QrCode size={13} />
+                <QrCode size={16} />
                 <span>Scan QR Code</span>
               </motion.button>
 
@@ -391,9 +391,9 @@ function OTPAttendance() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="flex flex-col items-center justify-center text-center py-12 space-y-3"
+              className="flex flex-col items-center justify-center text-center py-16 sm:py-20 space-y-4 sm:space-y-5"
             >
-              <svg className="w-16 h-16 text-[#10B981]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-20 h-20 text-[#10B981]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <motion.path
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
@@ -408,10 +408,10 @@ function OTPAttendance() {
                 />
               </svg>
 
-              <h2 className="text-xl font-black text-slate-800 tracking-tight mt-1">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight mt-1">
                 Verified Successfully
               </h2>
-              <p className="text-slate-500 font-bold text-[10px] uppercase tracking-wider">
+              <p className="text-slate-500 font-bold text-xs sm:text-sm uppercase tracking-wider">
                 Redirecting to dashboard...
               </p>
             </motion.div>
