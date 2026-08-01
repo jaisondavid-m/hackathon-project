@@ -76,12 +76,12 @@ function DashboardLayout({ user, onLogout }) {
         />
 
         {/* Content View wrap */}
-        <div className="flex-grow p-4 sm:p-5 flex flex-col">
+        <div className={`flex-grow flex flex-col ${location.pathname.includes('/student/otp') ? 'p-1 sm:p-2' : 'p-4 sm:p-5'}`}>
           {/* Wrapper card container - transparent for OTP card page to avoid double white cards */}
           <main 
             className={
               location.pathname.includes('/student/otp')
-                ? "flex-grow flex flex-col items-center justify-center p-2 sm:p-4"
+                ? "flex-grow flex flex-col items-center justify-center p-1 sm:p-2"
                 : "bg-white rounded-[32px] border border-slate-100/80 shadow-md p-6 sm:p-8 flex-grow flex flex-col"
             }
           >

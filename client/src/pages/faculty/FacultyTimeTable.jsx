@@ -17,48 +17,48 @@ function FacultyTimeTable() {
   // Dummy timetable grid mapping [Day][Period] - Styled uniformly using Brand Purple
   const timetableData = {
     Monday: {
-      1: { subject: 'Computer Networks', code: 'CS-302', venue: 'LH-201' },
-      2: { subject: 'Operating Systems', code: 'CS-304', venue: 'LH-102' },
+      1: { subject: 'Computer Networks', code: 'CS-302', venue: 'EW 225' },
+      2: { subject: 'Operating Systems', code: 'CS-304', venue: 'EW 224' },
       3: null, // Free
-      4: { subject: 'Database Management', code: 'CS-306', venue: 'Lab 2' },
-      5: { subject: 'Compiler Design', code: 'CS-308', venue: 'LH-202' },
+      4: { subject: 'Database Management', code: 'CS-306', venue: 'IT Lab 2' },
+      5: { subject: 'Compiler Design', code: 'CS-308', venue: 'EW 223' },
       6: null,
       7: null,
     },
     Tuesday: {
       1: null,
-      2: { subject: 'Database Management', code: 'CS-306', venue: 'Lab 2' },
-      3: { subject: 'Computer Networks', code: 'CS-302', venue: 'LH-201' },
+      2: { subject: 'Database Management', code: 'CS-306', venue: 'IT Lab 2' },
+      3: { subject: 'Computer Networks', code: 'CS-302', venue: 'EW 225' },
       4: null,
-      5: { subject: 'Software Engineering', code: 'CS-310', venue: 'LH-101' },
-      6: { subject: 'Operating Systems', code: 'CS-304', venue: 'LH-102' },
+      5: { subject: 'Software Engineering', code: 'CS-310', venue: 'SF-101' },
+      6: { subject: 'Operating Systems', code: 'CS-304', venue: 'EW 224' },
       7: null,
     },
     Wednesday: {
-      1: { subject: 'Compiler Design', code: 'CS-308', venue: 'LH-202' },
+      1: { subject: 'Compiler Design', code: 'CS-308', venue: 'EW 223' },
       2: null,
-      3: { subject: 'Software Engineering', code: 'CS-310', venue: 'LH-101' },
-      4: { subject: 'Computer Networks', code: 'CS-302', venue: 'LH-201' },
+      3: { subject: 'Software Engineering', code: 'CS-310', venue: 'SF-101' },
+      4: { subject: 'Computer Networks', code: 'CS-302', venue: 'EW 225' },
       5: null,
       6: null,
       7: null,
     },
     Thursday: {
-      1: { subject: 'Operating Systems', code: 'CS-304', venue: 'LH-102' },
-      2: { subject: 'Compiler Design', code: 'CS-308', venue: 'LH-202' },
+      1: { subject: 'Operating Systems', code: 'CS-304', venue: 'EW 224' },
+      2: { subject: 'Compiler Design', code: 'CS-308', venue: 'EW 223' },
       3: null,
       4: null,
-      5: { subject: 'Database Management', code: 'CS-306', venue: 'Lab 2' },
+      5: { subject: 'Database Management', code: 'CS-306', venue: 'IT Lab2' },
       6: null,
       7: null,
     },
     Friday: {
       1: null,
       2: null,
-      3: { subject: 'Software Engineering', code: 'CS-310', venue: 'LH-101' },
-      4: { subject: 'Computer Networks', code: 'CS-302', venue: 'LH-201' },
-      5: { subject: 'Compiler Design', code: 'CS-308', venue: 'LH-202' },
-      6: { subject: 'Database Management', code: 'CS-306', venue: 'Lab 2' },
+      3: { subject: 'Software Engineering', code: 'CS-310', venue: 'SF-101' },
+      4: { subject: 'Computer Networks', code: 'CS-302', venue: 'EW 225' },
+      5: { subject: 'Compiler Design', code: 'CS-308', venue: 'EW 223' },
+      6: { subject: 'Database Management', code: 'CS-306', venue: 'IT Lab2' },
       7: null,
     },
   };
@@ -88,7 +88,7 @@ function FacultyTimeTable() {
               </th>
               {periods.map((p) => (
                 <th key={p.num} className="p-3 border-l border-slate-100/80">
-                  <div className="text-[10px] font-extrabold text-[#7D53F6] uppercase tracking-wider">
+                  <div className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider">
                     Period {p.num}
                   </div>
                   <div className="text-[8px] text-slate-400 font-mono mt-0.5 font-bold uppercase select-none">
