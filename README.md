@@ -53,8 +53,6 @@ To successfully submit an attendance code, the system validates the student usin
 * ***Digital Geofencing (Classroom Boundaries)***: The system draws a precise virtual polygon around the physical classroom. The student's device must be within these GPS coordinates.
 * ***WiFi Router Matching (Campus Network)***: The system detects the student's connection IP address and verifies it against the specific physical routers installed inside that classroom. 
 
-*Why this works:* A student sitting in the hostel cannot mark attendance because they are outside the classroom coordinates and not connected to that room's specific WiFi router—even if a friend sends them the OTP code.
-=
 ### 2. Hashed OTP Verification
 To prevent students from sniffing/monitoring HTTP request payloads and manually marking attendance using external platforms like Postman, the system employs a secure hashing algorithm. 
 * **Client-Side Hashing**: The student's device hashes the OTP code before transmitting it.
