@@ -409,52 +409,54 @@ function OTPGeneration() {
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Left card: OTP code display */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2.5 pb-3.5 border-b border-slate-50">
-                    <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl">
-                      <ShieldCheck size={18} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-slate-800">OTP Code</h4>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                        Share this code with students
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center gap-2.5 my-6">
-                    {otpDigits.map((digit, i) => (
-                      <div
-                        key={i}
-                        className={`flex-grow aspect-[3/4] max-w-[50px] rounded-2xl border flex items-center justify-center font-extrabold text-2xl transition-all duration-200 ${
-                          activeSession
-                            ? 'border-[#7D53F6]/30 bg-[#7D53F6]/5 text-[#7D53F6]'
-                            : 'border-slate-200 bg-slate-50/30 text-slate-400'
-                        }`}
-                      >
-                        {digit}
+            <div className={`grid grid-cols-1 ${activeSession ? 'md:grid-cols-2' : ''} gap-5`}>
+              {/* Left card: OTP code display (Only when session is active) */}
+              {activeSession && (
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-2.5 pb-3.5 border-b border-slate-50">
+                      <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl">
+                        <ShieldCheck size={18} />
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-slate-800">OTP Code</h4>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                          Share this code with students
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 pt-3.5 border-t border-slate-50">
-                  <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md ${
-                    activeSession ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-400'
-                  }`}>
-                    <Clock size={11} className={activeSession ? 'animate-pulse' : ''} />
-                    <span>Valid for {activeSession ? formatTime(timeLeft) : '05:00'}</span>
+                    <div className="flex justify-between items-center gap-2.5 my-6">
+                      {otpDigits.map((digit, i) => (
+                        <div
+                          key={i}
+                          className={`flex-grow aspect-[3/4] max-w-[50px] rounded-2xl border flex items-center justify-center font-extrabold text-2xl transition-all duration-200 ${
+                            activeSession
+                              ? 'border-[#7D53F6]/30 bg-[#7D53F6]/5 text-[#7D53F6]'
+                              : 'border-slate-200 bg-slate-50/30 text-slate-400'
+                          }`}
+                        >
+                          {digit}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-slate-200">|</span>
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <Calendar size={11} />
-                    <span>Generated at {activeSession ? new Date(activeSession.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '10:30:45 AM'}</span>
+
+                  <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 pt-3.5 border-t border-slate-50">
+                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md ${
+                      activeSession ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-400'
+                    }`}>
+                      <Clock size={11} className={activeSession ? 'animate-pulse' : ''} />
+                      <span>Valid for {activeSession ? formatTime(timeLeft) : '05:00'}</span>
+                    </div>
+                    <span className="text-slate-200">|</span>
+                    <div className="flex items-center gap-1.5 text-slate-400">
+                      <Calendar size={11} />
+                      <span>Generated at {activeSession ? new Date(activeSession.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '10:30:45 AM'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Right card: QR Code & details */}
               <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
