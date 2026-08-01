@@ -21,6 +21,7 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
     if (path.includes('/faculty/timetable')) return 'timetable';
     if (path.includes('/faculty/my-attendance')) return 'my-attendance';
     if (path.includes('/faculty/profile')) return 'faculty-profile';
+    if (path.includes('/student/dashboard')) return 'student-dashboard';
     if (path.includes('/student/otp')) return 'student-otp';
     if (path.includes('/student/history')) return 'student-history';
     if (path.includes('/student/profile')) return 'student-profile';
@@ -46,8 +47,9 @@ function Sidebar({ user, mobileOpen, onCloseMobile }) {
       { id: 'faculty-profile', path: '/faculty/profile', label: 'Profile', icon: User },
     ],
     student: [
+      { id: 'student-dashboard', path: '/student/dashboard', label: 'Dashboard', icon: Layers },
       { id: 'student-otp', path: '/student/otp', label: 'Mark Attendance', icon: UserCheck },
-      { id: 'student-history', path: '/student/history', label: 'Attendance History', icon: Layers },
+      { id: 'student-history', path: '/student/history', label: 'Attendance History', icon: ClipboardList },
       { id: 'student-profile', path: '/student/profile', label: 'Profile', icon: User },
     ],
   };

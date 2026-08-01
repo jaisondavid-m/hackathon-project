@@ -14,6 +14,7 @@ import OTPGeneration from '../pages/faculty/OTPGeneration';
 import FacultyTimeTable from '../pages/faculty/FacultyTimeTable';
 import FacultyAttendance from '../pages/faculty/FacultyAttendance';
 import StudentDashboard from '../pages/student/StudentDashboard';
+import StudentDashboardView from '../pages/student/StudentDashboardView';
 import OTPAttendance from '../pages/student/OTPAttendance';
 import StudentHistory from '../pages/student/StudentHistory';
 import StudentProfile from '../pages/student/StudentProfile';
@@ -49,6 +50,7 @@ function DashboardLayout({ user, onLogout }) {
     if (path.includes('/faculty/otp')) return 'OTP & QR Code';
     if (path.includes('/faculty/timetable')) return 'Time Table';
     if (path.includes('/faculty/my-attendance')) return 'My Attendance';
+    if (path.includes('/student/dashboard')) return 'Student Dashboard';
     if (path.includes('/student/otp')) return 'Mark Attendance';
     if (path.includes('/student/history')) return 'Attendance History';
     if (path.includes('/profile')) return 'Profile Overview';
@@ -80,7 +82,7 @@ function DashboardLayout({ user, onLogout }) {
             className={
               location.pathname.includes('/student/otp')
                 ? "flex-grow flex flex-col items-center justify-center p-2 sm:p-4"
-                : "bg-white rounded-[32px] border border-slate-100/80 shadow-md p-6 sm:p-8 flex-grow"
+                : "bg-white rounded-[32px] border border-slate-100/80 shadow-md p-6 sm:p-8 flex-grow flex flex-col"
             }
           >
             <Outlet context={{ user, onLogout }} />
@@ -201,7 +203,8 @@ function App() {
         {/* Student routes */}
         <Route element={<ProtectedRoute user={user} allowedRole="student" />}>
           <Route path="/student" element={<StudentDashboard user={user} />}>
-            <Route index element={<Navigate to="otp" replace />} />
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<StudentDashboardView />} />
             <Route path="otp" element={<OTPAttendance />} />
             <Route path="history" element={<StudentHistory />} />
             <Route path="profile" element={<StudentProfile />} />
