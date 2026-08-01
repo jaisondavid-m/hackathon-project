@@ -32,7 +32,6 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
   const menuItems = {
     admin: [
       { id: 'venues', path: '/admin/venues', label: 'Venue Management', icon: MapPin },
-      { id: 'working-days', path: '/admin/working-days', label: 'Working Day Mapping', icon: Calendar },
       { id: 'otp-mapping', path: '/admin/otp-mapping', label: 'OTP Mapping', icon: Layers },
       { id: 'session-details', path: '/admin/session-details', label: 'Session Details', icon: Clock },
       { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', icon: Layers },
