@@ -162,16 +162,6 @@ function OTPGeneration() {
           )}
 
           <div className="space-y-4">
-            {/* Holiday or Half Day warnings */}
-            {todayOverride && todayOverride.is_holiday && (
-              <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-start gap-3 text-rose-700 text-xs font-semibold">
-                <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
-                <div>
-                  <strong>Holiday Notice:</strong> Today is configured as a Holiday ({todayOverride.name}). Marking attendance is disabled.
-                </div>
-              </div>
-            )}
-
             {todayOverride && todayOverride.is_half_day && (
               <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-3 text-amber-700 text-xs font-semibold">
                 <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
@@ -214,12 +204,8 @@ function OTPGeneration() {
             {/* Submit generate */}
             <button
               onClick={handleGenerateOTP}
-              disabled={otpLoading || (todayOverride && todayOverride.is_holiday)}
-              className={`w-full flex items-center justify-center gap-2 py-3 font-bold rounded-2xl transition-all duration-200 ${
-                (todayOverride && todayOverride.is_holiday)
-                  ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
-                  : 'bg-[#7D53F6] hover:bg-[#683cdb] text-white shadow-lg shadow-[#7D53F6]/20 cursor-pointer'
-              }`}
+              disabled={otpLoading}
+              className="w-full flex items-center justify-center gap-2 py-3 font-bold rounded-2xl transition-all duration-200 bg-[#7D53F6] hover:bg-[#683cdb] text-white shadow-lg shadow-[#7D53F6]/20 cursor-pointer"
             >
               {otpLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -60,11 +60,13 @@ func (cc *ConfigController) SaveHourConfigs(c *gin.Context) {
 	}
 
 	// Log configurations edit
-	adminEmail, _ := c.Get("emailid")
-	adminRole, _ := c.Get("role")
+	emailVal, _ := c.Get("emailid")
+	roleVal, _ := c.Get("role")
+	adminEmail, _ := emailVal.(string)
+	adminRole, _ := roleVal.(string)
 	database.LogActivity(
-		adminEmail.(string),
-		adminRole.(string),
+		adminEmail,
+		adminRole,
 		"Hours Config Saved",
 		"Updated timeslots configurations for daily hours",
 		c.ClientIP(),
@@ -103,8 +105,10 @@ func (cc *ConfigController) SaveHoliday(c *gin.Context) {
 	}
 
 	// Log calendar override
-	adminEmail, _ := c.Get("emailid")
-	adminRole, _ := c.Get("role")
+	emailVal, _ := c.Get("emailid")
+	roleVal, _ := c.Get("role")
+	adminEmail, _ := emailVal.(string)
+	adminRole, _ := roleVal.(string)
 	statusStr := "Working Day"
 	if req.IsHoliday {
 		statusStr = "Holiday"
@@ -112,8 +116,8 @@ func (cc *ConfigController) SaveHoliday(c *gin.Context) {
 		statusStr = "Half Day"
 	}
 	database.LogActivity(
-		adminEmail.(string),
-		adminRole.(string),
+		adminEmail,
+		adminRole,
 		"Holiday Override Saved",
 		"Set date "+req.Date+" to status: "+statusStr+" ("+req.Name+")",
 		c.ClientIP(),
@@ -175,8 +179,10 @@ func (cc *ConfigController) SaveHolidayBatch(c *gin.Context) {
 	}
 
 	// Log event
-	adminEmail, _ := c.Get("emailid")
-	adminRole, _ := c.Get("role")
+	emailVal, _ := c.Get("emailid")
+	roleVal, _ := c.Get("role")
+	adminEmail, _ := emailVal.(string)
+	adminRole, _ := roleVal.(string)
 	statusStr := "Working Day"
 	if req.IsHoliday {
 		statusStr = "Holiday"
@@ -185,8 +191,8 @@ func (cc *ConfigController) SaveHolidayBatch(c *gin.Context) {
 	}
 
 	database.LogActivity(
-		adminEmail.(string),
-		adminRole.(string),
+		adminEmail,
+		adminRole,
 		"Batch Holiday Override Saved",
 		"Set dates from "+req.StartDate+" to "+req.EndDate+" to status: "+statusStr+" ("+req.Name+")",
 		c.ClientIP(),
@@ -250,15 +256,17 @@ func (cc *ConfigController) CreateOtpMapping(c *gin.Context) {
 		// Update existing mapping venue
 		mapping.VenueID = req.VenueID
 		mapping.VenueName = venue.Name
-		if err := cc.DB.Save(&mapping).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update mapping details"})
+		mapping.FacultyName = faculty.Name
+		mapping.ClassName = className
+		if err := cc.DB.Omit("Students").Save(&mapping).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update mapping details: " + err.Error()})
 			return
 		}
 		// Clear existing student relationships
 		cc.DB.Where("mapping_id = ?", mapping.ID).Delete(&models.OtpMappingStudent{})
 	} else {
 		// Create new mapping
-		mapping = models.OtpMapping{
+		newMapping := models.OtpMapping{
 			FacultyEmail: req.FacultyEmail,
 			FacultyName:  faculty.Name,
 			ClassID:      req.ClassID,
@@ -266,10 +274,11 @@ func (cc *ConfigController) CreateOtpMapping(c *gin.Context) {
 			VenueID:      req.VenueID,
 			VenueName:    venue.Name,
 		}
-		if err := cc.DB.Create(&mapping).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create mapping record"})
+		if err := cc.DB.Omit("Students").Create(&newMapping).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create mapping record: " + err.Error()})
 			return
 		}
+		mapping = newMapping
 	}
 
 	// Create new student entries
@@ -285,7 +294,7 @@ func (cc *ConfigController) CreateOtpMapping(c *gin.Context) {
 			StudentName:  student.Name,
 		}
 		if err := cc.DB.Create(&studMapping).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create student mapping for " + email})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create student mapping for " + email + ": " + err.Error()})
 			return
 		}
 	}
@@ -294,11 +303,13 @@ func (cc *ConfigController) CreateOtpMapping(c *gin.Context) {
 	cc.DB.Preload("Students").First(&mapping, mapping.ID)
 
 	// Log activity
-	adminEmail, _ := c.Get("emailid")
-	adminRole, _ := c.Get("role")
+	emailVal, _ := c.Get("emailid")
+	roleVal, _ := c.Get("role")
+	adminEmail, _ := emailVal.(string)
+	adminRole, _ := roleVal.(string)
 	database.LogActivity(
-		adminEmail.(string),
-		adminRole.(string),
+		adminEmail,
+		adminRole,
 		"OTP Mapping Configured",
 		"Mapped faculty "+mapping.FacultyEmail+" to class "+mapping.ClassID+" in venue "+mapping.VenueName+" with "+fmt.Sprintf("%d", len(mapping.Students))+" students",
 		c.ClientIP(),

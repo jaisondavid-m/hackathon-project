@@ -54,6 +54,8 @@ type OtpMapping struct {
 	ClassName    string               `gorm:"size:255" json:"class_name"`
 	VenueID      uint                 `gorm:"not null" json:"venue_id"`
 	VenueName    string               `gorm:"size:255" json:"venue_name"`
+	StudentEmail string               `gorm:"size:255;default:''" json:"student_email,omitempty"`
+	StudentName  string               `gorm:"size:255;default:''" json:"student_name,omitempty"`
 	Students     []OtpMappingStudent  `gorm:"foreignKey:MappingID;constraint:OnDelete:CASCADE" json:"students"`
 }
 

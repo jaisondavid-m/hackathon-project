@@ -56,6 +56,15 @@ func InitDB(dsn string) (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to auto-migrate database: %w", err)
 	}
+
+	// Fix legacy column constraints on otp_mappings table if present from previous migrations
+	if DB.Migrator().HasColumn(&models.OtpMapping{}, "student_email") {
+		DB.Exec("ALTER TABLE otp_mappings MODIFY COLUMN student_email VARCHAR(255) NULL DEFAULT ''")
+	}
+	if DB.Migrator().HasColumn(&models.OtpMapping{}, "student_name") {
+		DB.Exec("ALTER TABLE otp_mappings MODIFY COLUMN student_name VARCHAR(255) NULL DEFAULT ''")
+	}
+
 	log.Println("Database auto-migration completed")
 
 	// Seed test accounts and hours config if tables are empty
