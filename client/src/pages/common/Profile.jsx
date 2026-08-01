@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import {
   User, Mail, Shield, BookOpen, Key, Info, Edit3, Check, 
   MapPin, Phone, Calendar, Hash, Award, ShieldCheck, Sparkles,
-  Sun, Sunset, Moon
+  Sun, Sunset, Moon, GraduationCap, Briefcase, PhoneCall, UserCheck, Clock
 } from 'lucide-react';
 
 function Profile() {
@@ -160,6 +160,286 @@ function Profile() {
         };
     }
   };
+
+  if (role === 'faculty') {
+    const defaultName = user?.name || 'Faculty Member';
+    const defaultEmail = user?.emailid || 'faculty@bitsathy.ac.in';
+    const employeeId = user?.employee_id || `FAC-2024-00${user?.id || '3'}`;
+    const department = user?.department || 'Computer Science & Engineering';
+    const designation = user?.designation || 'Assistant Professor';
+    const qualification = user?.qualification || 'M.E. (CSE)';
+    const experience = user?.experience || '5 Years';
+    const specialization = user?.specialization || 'Computer Science & Engineering';
+    const mobile = user?.mobile || '+91 93456 78901';
+    const officePhone = user?.office_phone || '+91 42 245678';
+    const officeLocation = user?.office_location || 'Block A - Room 214';
+
+    const formatLastLogin = (lastSign) => {
+      if (!lastSign) return 'Today, 10:35 AM';
+      try {
+        const date = new Date(lastSign);
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (isToday) {
+          return `Today, ${timeStr}`;
+        }
+        return `${date.toLocaleDateString([], { month: 'short', day: 'numeric' })}, ${timeStr}`;
+      } catch (e) {
+        return 'Today, 10:35 AM';
+      }
+    };
+
+    const lastLoginFormatted = formatLastLogin(user?.last_sign);
+
+    return (
+      <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-10 text-left">
+        
+        {/* Title and Subtitle Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Faculty Profile</h1>
+            <p className="text-slate-500 text-sm mt-1">View and manage your personal and professional information</p>
+          </div>
+          <button 
+            onClick={() => alert("Profile edits must be requested via the campus Registrar Office.")}
+            className="flex items-center gap-2 border border-indigo-600 bg-white hover:bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-semibold text-sm shadow-sm transition-all duration-150 cursor-pointer focus:outline-none"
+          >
+            <Edit3 size={15} />
+            <span>Edit Profile</span>
+          </button>
+        </div>
+
+        {/* Top Header Card */}
+        <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-5 w-full md:w-auto">
+            {/* Round Avatar */}
+            <div className="w-24 h-24 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center font-bold text-3xl shadow-sm border border-violet-200 flex-shrink-0">
+              {getInitials(defaultName)}
+            </div>
+            
+            <div className="text-center sm:text-left space-y-2">
+              <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+                {defaultName}
+              </h2>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-xs font-semibold border border-violet-100 shadow-sm leading-none">
+                  <GraduationCap size={13} className="text-violet-600" />
+                  {designation}
+                </span>
+                <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-full text-xs font-semibold shadow-sm leading-none">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                  Active
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="hidden md:block w-px h-16 bg-slate-100" />
+
+          {/* Right part */}
+          <div className="flex flex-col sm:flex-row gap-6 w-full md:w-auto">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100/50">
+                <Calendar size={18} />
+              </div>
+              <div className="text-left">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faculty ID</span>
+                <span className="font-bold text-slate-700 text-sm mt-0.5 block">{employeeId}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100/50">
+                <BookOpen size={18} />
+              </div>
+              <div className="text-left">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Department</span>
+                <span className="font-bold text-slate-700 text-sm mt-0.5 block">{department}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Information Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Personal Information */}
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md p-6 hover:shadow-lg transition-all duration-300">
+            <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+              <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl">
+                <User size={18} className="stroke-[2.5]" />
+              </div>
+              <h3 className="font-bold text-slate-800 text-base tracking-wide">
+                Personal Information
+              </h3>
+            </div>
+            
+            <div className="mt-4 divide-y divide-slate-100">
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <User size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Full Name</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{defaultName}</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Mail size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Email Address</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{defaultEmail}</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Phone size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Mobile Number</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{mobile}</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <PhoneCall size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Office Phone</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{officePhone}</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <MapPin size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Office Location</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{officeLocation}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Professional Information */}
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md p-6 hover:shadow-lg transition-all duration-300">
+            <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+              <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl">
+                <GraduationCap size={18} className="stroke-[2.5]" />
+              </div>
+              <h3 className="font-bold text-slate-800 text-base tracking-wide">
+                Professional Information
+              </h3>
+            </div>
+            
+            <div className="mt-4 divide-y divide-slate-100">
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Award size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Designation</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{designation}</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Award size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Qualification</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{qualification}</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Briefcase size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Experience</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{experience}</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <BookOpen size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Specialization</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{specialization}</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Hash size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Employee ID</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{employeeId}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Subjects Assigned */}
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md p-6 hover:shadow-lg transition-all duration-300">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl">
+                  <BookOpen size={18} className="stroke-[2.5]" />
+                </div>
+                <h3 className="font-bold text-slate-800 text-base tracking-wide">
+                  Subjects Assigned
+                </h3>
+              </div>
+              <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold border border-indigo-100">
+                3 Subjects
+              </span>
+            </div>
+            
+            <div className="mt-5 flex flex-wrap gap-3">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-violet-50 text-violet-700 rounded-2xl border border-violet-100 font-semibold text-sm">
+                <BookOpen size={14} className="text-violet-600" />
+                <span>CS101 - Data Structures</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-violet-50 text-violet-700 rounded-2xl border border-violet-100 font-semibold text-sm">
+                <BookOpen size={14} className="text-violet-600" />
+                <span>CS202 - Database Management Systems</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-violet-50 text-violet-700 rounded-2xl border border-violet-100 font-semibold text-sm">
+                <BookOpen size={14} className="text-violet-600" />
+                <span>CS305 - Web Engineering</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Account Information */}
+          <div className="bg-white rounded-3xl border border-slate-100/80 shadow-md p-6 hover:shadow-lg transition-all duration-300">
+            <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+              <div className="p-2 bg-[#7D53F6]/10 text-[#7D53F6] rounded-xl">
+                <ShieldCheck size={18} className="stroke-[2.5]" />
+              </div>
+              <h3 className="font-bold text-slate-800 text-base tracking-wide">
+                Account Information
+              </h3>
+            </div>
+            
+            <div className="mt-4 divide-y divide-slate-100">
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <UserCheck size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Role</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">Faculty Staff</span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <ShieldCheck size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Account Status</span>
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                  Active
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Clock size={15} className="text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-500">Last Login</span>
+                </div>
+                <span className="text-sm font-bold text-slate-700">{lastLoginFormatted}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const pData = getProfileData();
 
