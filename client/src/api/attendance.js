@@ -45,8 +45,44 @@ export const attendanceService = {
    * @param {number} longitude Student longitude
    */
   async submitOTP(otp, latitude, longitude) {
+    let encryptedOtp = otp;
+    try {
+      const keyStr = import.meta.env.VITE_OTP_ENCRYPTION_KEY || 'default_otp_secret_key_12345678';
+      const enc = new TextEncoder();
+      
+      // 1. Derive 256-bit AES key by hashing the passphrase with SHA-256
+      const keyBuffer = await window.crypto.subtle.digest("SHA-256", enc.encode(keyStr));
+      const cryptoKey = await window.crypto.subtle.importKey(
+        "raw",
+        keyBuffer,
+        { name: "AES-CBC" },
+        false,
+        ["encrypt"]
+      );
+      
+      // 2. Generate a random 16-byte initialization vector (IV)
+      const iv = window.crypto.getRandomValues(new Uint8Array(16));
+      
+      // 3. Encrypt the OTP value
+      const encryptedBuffer = await window.crypto.subtle.encrypt(
+        { name: "AES-CBC", iv: iv },
+        cryptoKey,
+        enc.encode(otp)
+      );
+      
+      // 4. Combine IV and encrypted bytes into a single array
+      const combined = new Uint8Array(iv.length + encryptedBuffer.byteLength);
+      combined.set(iv);
+      combined.set(new Uint8Array(encryptedBuffer), iv.length);
+      
+      // 5. Encode combined bytes as a hex string
+      encryptedOtp = Array.from(combined).map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (e) {
+      console.error('Failed to encrypt OTP:', e);
+    }
+
     const response = await api.post('/student/attendance/submit', {
-      otp,
+      otp: encryptedOtp,
       latitude: Number(latitude),
       longitude: Number(longitude)
     });

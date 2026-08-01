@@ -42,7 +42,7 @@ type CreateSessionRequest struct {
 }
 
 type SubmitOTPRequest struct {
-	OTP       string  `json:"otp" binding:"required,len=6"`
+	OTP       string  `json:"otp" binding:"required"`
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }

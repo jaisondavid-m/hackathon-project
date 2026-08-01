@@ -1,11 +1,16 @@
 package controllers
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math"
 	"net/http"
+	"os"
 	"time"
 
 	"server/database"
@@ -233,6 +238,19 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 		return
 	}
 
+	// Decrypt the OTP payload
+	passphrase := os.Getenv("OTP_ENCRYPTION_KEY")
+	if passphrase == "" {
+		passphrase = "default_otp_secret_key_12345678"
+	}
+
+	decryptedOtp, err := DecryptOTP(req.OTP, passphrase)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to decrypt secure verification code. Invalid cipher text."})
+		return
+	}
+	req.OTP = decryptedOtp
+
 	// Fetch student name from User database
 	var student models.User
 	if err := ac.DB.First(&student, studentID).Error; err != nil {
@@ -242,7 +260,7 @@ func (ac *AttendanceController) SubmitOTP(c *gin.Context) {
 
 	// Find active unexpired session for this OTP
 	var session models.AttendanceSession
-	err := ac.DB.Where("otp = ? AND is_active = ? AND expires_at > ?", req.OTP, true, time.Now()).First(&session).Error
+	err = ac.DB.Where("otp = ? AND is_active = ? AND expires_at > ?", req.OTP, true, time.Now()).First(&session).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid or expired OTP code"})
@@ -403,4 +421,63 @@ func (ac *AttendanceController) GetClassAttendanceLogs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, records)
+}
+
+// Decrypts hex-encoded AES-CBC encrypted ciphertext using derived SHA-256 key from passphrase.
+func DecryptOTP(encryptedHex string, passphrase string) (string, error) {
+	encryptedBytes, err := hex.DecodeString(encryptedHex)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode hex: %w", err)
+	}
+
+	if len(encryptedBytes) < 16 {
+		return "", errors.New("ciphertext too short")
+	}
+
+	iv := encryptedBytes[:16]
+	ciphertext := encryptedBytes[16:]
+
+	// Hash passphrase to 32 bytes (SHA-256)
+	key := sha256.Sum256([]byte(passphrase))
+
+	block, err := aes.NewCipher(key[:])
+	if err != nil {
+		return "", fmt.Errorf("failed to create cipher: %w", err)
+	}
+
+	if len(ciphertext)%aes.BlockSize != 0 {
+		return "", errors.New("ciphertext is not a multiple of the block size")
+	}
+
+	mode := cipher.NewCBCDecrypter(block, iv)
+	decrypted := make([]byte, len(ciphertext))
+	mode.CryptBlocks(decrypted, ciphertext)
+
+	// Unpad PKCS#7
+	unpadded, err := pkcs7Unpad(decrypted, aes.BlockSize)
+	if err != nil {
+		return "", fmt.Errorf("failed to unpad: %w", err)
+	}
+
+	return string(unpadded), nil
+}
+
+func pkcs7Unpad(data []byte, blockSize int) ([]byte, error) {
+	length := len(data)
+	if length == 0 {
+		return nil, errors.New("empty data")
+	}
+	if length%blockSize != 0 {
+		return nil, errors.New("data size not block multiple")
+	}
+	padding := int(data[length-1])
+	if padding < 1 || padding > blockSize {
+		return nil, errors.New("invalid padding byte")
+	}
+	for i := 0; i < padding; i++ {
+		if int(data[length-1-i]) != padding {
+			return nil, errors.New("invalid padding character")
+		}
+	}
+	return data[:length-padding], nil
 }
