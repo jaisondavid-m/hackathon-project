@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Key, AlertCircle, Clock, QrCode, UserCheck, RefreshCw 
+import {
+  Key, AlertCircle, Clock, QrCode, UserCheck, RefreshCw
 } from 'lucide-react';
 import { attendanceService } from '../../api/attendance';
 import { configService } from '../../api/config';
@@ -66,7 +66,7 @@ function OTPGeneration() {
 
   const startTimerAndPolling = (session) => {
     setActiveSession(session);
-    
+
     // Set timer
     const expiryTime = new Date(session.expires_at).getTime();
     const now = new Date().getTime();
@@ -182,11 +182,10 @@ function OTPGeneration() {
                     key={hr}
                     type="button"
                     onClick={() => setSelectedHour(hr)}
-                    className={`py-2 px-1 border text-center text-xs font-extrabold rounded-xl transition-all duration-150 cursor-pointer ${
-                      selectedHour === hr
+                    className={`py-2 px-1 border text-center text-xs font-extrabold rounded-xl transition-all duration-150 cursor-pointer ${selectedHour === hr
                         ? 'bg-[#7D53F6] border-[#7D53F6] text-white shadow-sm'
                         : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                    }`}
+                      }`}
                   >
                     H{hr}
                   </button>
