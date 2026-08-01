@@ -4,6 +4,20 @@
 
 > **🌐 Live Demo:** [https://pcdp-v4.bitsathy.in](https://pcdp-v4.bitsathy.in/)
 
+---
+
+## 👥 Team Details
+
+| | |
+|---|---|
+| **Team Name** | Team Dynamic |
+| **Institution** | Bannari Amman Institute of Technology |
+| **Team Leader** | Thillainathan S |
+| **Team Members** | Jaison David M, Sanjay M |
+| **Year** | 2026 |
+
+---
+
 **Attendance Monitoring with QR Code Check-in** is an intelligent, high-trust classroom attendance system designed to eliminate "proxy" attendance and check-in manipulation. By combining location verification, local campus network validation, and secure cryptographic handshakes, the system guarantees that attendance can only be marked by students physically present in the classroom.
 
 ---
@@ -126,6 +140,14 @@ The Student console offers quick and secure attendance marking:
 refer: https://dbdiagram.io/d/6a6c3f0bc3a90dd98df5c553
 
 ![Database Entity-Relationship Diagram](docs/images/dbdiagram.png)
+
+---
+
+## 📋 SRS Document
+
+> The full **Software Requirements Specification (SRS)** for this project is available for review:
+>
+> 🔗 **[View SRS Document on Banani](https://app.banani.co/preview/-2SNztMxCEj5?screen=SRS-Presentation)**
 
 ---
 
