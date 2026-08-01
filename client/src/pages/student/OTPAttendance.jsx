@@ -46,6 +46,10 @@ function OTPAttendance() {
     useRef(null)
   ];
 
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [cameraError, setCameraError] = useState('');
+
   // Combined OTP string
   const otp = otpValues.join('');
 
@@ -220,21 +224,92 @@ function OTPAttendance() {
     );
   };
 
-  const handleSimulateScan = () => {
-    setScanStatus('scanning');
+  useEffect(() => {
+    let active = true;
+    let stream = null;
+    let animationId = null;
 
-    setTimeout(() => {
-      const mockScannedOtp = '583921';
-      const nextValues = mockScannedOtp.split('');
-      setOtpValues(nextValues);
-      setScanStatus('success');
+    const startCamera = async () => {
+      setCameraError('');
+      setScanStatus('scanning');
+      try {
+        if (!window.jsQR) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Failed to load QR scanner library.'));
+            document.body.appendChild(script);
+          });
+        }
 
-      setTimeout(() => {
-        setShowScanner(false);
-        setScanStatus('idle');
-      }, 1000);
-    }, 2000);
-  };
+        if (!active) return;
+
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.setAttribute('playsinline', 'true');
+          videoRef.current.play();
+        }
+
+        const tick = () => {
+          if (!active) return;
+          if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+            const canvas = canvasRef.current;
+            const video = videoRef.current;
+            if (canvas && video) {
+              const ctx = canvas.getContext('2d');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              
+              if (window.jsQR) {
+                const code = window.jsQR(imageData.data, imageData.width, imageData.height, {
+                  inversionAttempts: 'dontInvert',
+                });
+
+                if (code && code.data) {
+                  setScanStatus('success');
+                  const digits = code.data.replace(/\D/g, '').substring(0, 6);
+                  if (digits.length === 6) {
+                    setOtpValues(digits.split(''));
+                    setTimeout(() => {
+                      setShowScanner(false);
+                      setScanStatus('idle');
+                    }, 1500);
+                    return;
+                  }
+                }
+              }
+            }
+          }
+          animationId = requestAnimationFrame(tick);
+        };
+        animationId = requestAnimationFrame(tick);
+
+      } catch (err) {
+        console.error(err);
+        setCameraError(err.name === 'NotAllowedError' ? 'Camera access was denied. Please check permissions.' : 'Could not access the camera stream.');
+        setScanStatus('error');
+      }
+    };
+
+    if (showScanner) {
+      startCamera();
+    } else {
+      setScanStatus('idle');
+    }
+
+    return () => {
+      active = false;
+      if (animationId) cancelAnimationFrame(animationId);
+      if (stream) stream.getTracks().forEach(track => track.stop());
+    };
+  }, [showScanner]);
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -419,6 +494,9 @@ function OTPAttendance() {
         </AnimatePresence>
       </motion.div>
 
+      {/* Hidden canvas for capturing QR frames */}
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+
       {/* QR Code Scanner Dialog Modal */}
       <AnimatePresence>
         {showScanner && (
@@ -451,51 +529,55 @@ function OTPAttendance() {
                 <div className="w-56 h-56 bg-slate-950 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border-4 border-slate-800 shadow-inner">
                   {scanStatus === 'scanning' ? (
                     <>
+                      <video 
+                        ref={videoRef} 
+                        className="absolute inset-0 w-full h-full object-cover" 
+                      />
                       <motion.div
                         animate={{ top: ['0%', '100%', '0%'] }}
                         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                         className="absolute left-0 right-0 h-0.5 bg-red-500 shadow-[0_0_10px_1.5px_rgba(239,68,68,0.8)] z-20 pointer-events-none"
                       />
-                      <div className="absolute inset-6 border border-white/20 rounded-lg pointer-events-none z-10" />
-                      <div className="text-center text-white/50 text-[9px] font-bold uppercase tracking-widest animate-pulse flex flex-col items-center gap-1.5">
-                        <Camera size={20} className="text-[#4F46E5]" />
-                        <span>Searching for QR Code...</span>
-                      </div>
+                      <div className="absolute inset-6 border-2 border-white/30 rounded-lg pointer-events-none z-10" />
                     </>
                   ) : scanStatus === 'success' ? (
                     <motion.div
                       initial={{ scale: 0.8 }}
                       animate={{ scale: 1 }}
-                      className="text-center text-emerald-400 font-extrabold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1.5"
+                      className="text-center text-emerald-400 font-extrabold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1.5 z-10"
                     >
                       <CheckCircle size={30} className="text-emerald-400" />
                       <span>Code Detected!</span>
                     </motion.div>
                   ) : (
-                    <div className="text-center text-slate-500 text-[9px] font-bold uppercase tracking-widest flex flex-col items-center gap-2 p-3">
-                      <Camera size={20} className="text-slate-600" />
-                      <span>Scanner ready. Click simulate below to start camera scan.</span>
+                    <div className="text-center text-rose-400 text-[10px] font-bold uppercase tracking-widest flex flex-col items-center gap-2 p-4 z-10">
+                      <AlertTriangle size={30} className="text-rose-400" />
+                      <span className="text-center">{cameraError || 'Camera permission denied or not found.'}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="text-center text-[11px] font-semibold text-slate-500 leading-normal max-w-[240px]">
                   {scanStatus === 'scanning' ? (
-                    <span className="text-[#4F46E5]">Simulating visual capturing and boundary geofence check...</span>
+                    <span className="text-[#4F46E5]">Capturing visual frames and analyzing for QR codes...</span>
                   ) : scanStatus === 'success' ? (
                     <span className="text-emerald-600">Verification OTP populated successfully.</span>
                   ) : (
-                    <span>Position the QR code inside the camera viewfinder to scan.</span>
+                    <span className="text-rose-600">Could not start camera feed. Please check device permissions.</span>
                   )}
                 </div>
 
-                {scanStatus === 'idle' && (
+                {scanStatus === 'error' && (
                   <button
-                    onClick={handleSimulateScan}
+                    onClick={() => {
+                      setScanStatus('idle');
+                      setShowScanner(false);
+                      setTimeout(() => setShowScanner(true), 100);
+                    }}
                     className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer flex items-center gap-1.5 transition-colors"
                   >
                     <RefreshCw size={12} />
-                    <span>Simulate Scanner Scan</span>
+                    <span>Try Again</span>
                   </button>
                 )}
               </div>
