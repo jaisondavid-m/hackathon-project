@@ -59,11 +59,21 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white flex-grow">
       {/* Logo area */}
-      <div className="h-16 px-6 border-b border-slate-100 flex items-center gap-3 flex-shrink-0">
-        <img src="/logo.png" alt="PCDP Logo" className="h-8 w-auto flex-shrink-0" />
-        <span className="font-black text-slate-800 text-lg sm:text-xl">
-          PCDP <span className="text-[#7D53F6]">v4.0</span>
-        </span>
+      <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="PCDP Logo" className="h-8 w-auto flex-shrink-0" />
+          <span className="font-black text-slate-800 text-lg sm:text-xl">
+            PCDP <span className="text-[#7D53F6]">v4.0</span>
+          </span>
+        </div>
+        {onCloseMobile && (
+          <button
+            onClick={onCloseMobile}
+            className="lg:hidden text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-none p-1"
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       {/* Menu Label */}
@@ -126,18 +136,6 @@ function Sidebar({ user, mobileOpen, onCloseMobile, onLogout }) {
       {mobileOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 lg:hidden">
           <aside className="w-64 bg-white h-full shadow-2xl flex flex-col animate-slideRight">
-            <div className="h-16 px-6 border-b border-slate-100 flex justify-between items-center flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <img src="/logo.png" alt="PCDP Logo" className="h-7 w-auto flex-shrink-0" />
-                <span className="font-black text-slate-800 text-lg">PCDP v4.0</span>
-              </div>
-              <button
-                onClick={onCloseMobile}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-none"
-              >
-                <X size={20} />
-              </button>
-            </div>
             {sidebarContent}
           </aside>
         </div>
