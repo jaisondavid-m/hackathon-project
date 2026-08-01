@@ -56,7 +56,7 @@ func LoadConfig() *Config {
 	dbName := getEnv("DB_NAME", "test")
 
 	var dsn string
-	if dbHost == "localhost" || dbHost == "127.0.0.1" || dbHost == "mysql" || getEnv("DB_TLS", "false") == "false" {
+	if dbHost == "localhost" || dbHost == "127.0.0.1" || dbHost == "mysql" || getEnv("DB_TLS", "") == "false" {
 		if os.Getenv("DB_USER") == "" {
 			dbUser = "root"
 		}
