@@ -1,5 +1,3 @@
 pcdp-v4.bitsathy.in {
-
     reverse_proxy frontend:80
-
 }

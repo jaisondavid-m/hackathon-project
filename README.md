@@ -2,6 +2,8 @@
 
 ### 🚀 Hackathon Project Reference
 
+> **🌐 Live Demo:** [https://pcdp-v4.bitsathy.in](https://pcdp-v4.bitsathy.in/)
+
 **Attendance Monitoring with QR Code Check-in** is an intelligent, high-trust classroom attendance system designed to eliminate "proxy" attendance and check-in manipulation. By combining location verification, local campus network validation, and secure cryptographic handshakes, the system guarantees that attendance can only be marked by students physically present in the classroom.
 
 ---
@@ -101,6 +103,10 @@ The Student console offers quick and secure attendance marking:
 
 ## 🔄 User Workflow: How it Works
 
+> The diagram below illustrates the complete end-to-end workflow — from the problem being solved to the secure verification pipeline.
+
+![System Workflow – Secure Attendance Verification Pipeline](docs/images/workflow.png)
+
 ### For Faculty Staff
 1. **Start Session**: Select the class hour on the dashboard.
 2. **Display Code**: The system displays a unique, secure OTP code alongside a solid black QR Code.
@@ -110,6 +116,14 @@ The Student console offers quick and secure attendance marking:
 1. **Scan QR Code**: Open the console on a mobile browser and scan the classroom QR code.
 2. **Mark Attendance**: Enter the OTP. The system automatically fetches device coordinates and network IP details in the background.
 3. **Instant Validation**: If the student is physically present inside the boundary or connected to the classroom WiFi, the present status is instantly recorded.
+
+---
+
+## 🗄️ Database Schema
+
+> The relational schema powering the system — covering users, venues, geofences, sessions, attendance records, and audit logs.
+
+![Database Entity-Relationship Diagram](docs/images/dbdiagram.png)
 
 ---
 
@@ -130,8 +144,11 @@ While the user experience is kept simple and non-technical, the backend runs on 
 * **Mathematical Bounding Checks**: Runs a ray-casting polygon mathematical check to determine if coordinate points fall inside the classroom boundaries.
 
 ### Infrastructure & Deployment
-* **Docker & Docker Compose**: Containerizes the MySQL database, Go backend, and Nginx frontend for reliable, single-command installations.
-* **Caddy Server**: Serves as a reverse proxy, managing SSL/TLS certificates and routing traffic securely.
+* **Docker & Docker Compose**: Containerizes the MySQL database, Go backend, and Nginx frontend into isolated services for reliable, single-command installations (`docker compose up --build`).
+* **Caddy Server**: Serves as a production-grade reverse proxy with automatic HTTPS (SSL/TLS) via Let's Encrypt, zero-downtime reloads, and clean traffic routing.
+* **VM-Based Production Deployment (Not Vercel/Render)**: The application is **not** deployed on managed PaaS platforms. Instead, it runs on a **bare Virtual Machine**, demonstrating end-to-end DevOps knowledge — from provisioning the server, configuring DNS, setting up Docker, managing firewall rules, to serving a live production system from scratch. This approach provides full infrastructure control and mirrors real-world enterprise deployment workflows.
+
+> 🌐 **Live at:** [https://pcdp-v4.bitsathy.in](https://pcdp-v4.bitsathy.in/)
 
 ---
 
