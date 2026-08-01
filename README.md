@@ -54,11 +54,8 @@ To successfully submit an attendance code, the system validates the student usin
 * ***WiFi Router Matching (Campus Network)***: The system detects the student's connection IP address and verifies it against the specific physical routers installed inside that classroom. 
 
 *Why this works:* A student sitting in the hostel cannot mark attendance because they are outside the classroom coordinates and not connected to that room's specific WiFi router—even if a friend sends them the OTP code.
-
-### 2. Time-Restricted Sessions (7 Seconds Expiry)
-Attendance codes are dynamically generated and expire automatically after 7 seconds. This creates a tiny window of opportunity that prevents sharing codes for later use.
-
-### Hashed OTP Verification
+=
+### 2. Hashed OTP Verification
 To prevent students from sniffing/monitoring HTTP request payloads and manually marking attendance using external platforms like Postman, the system employs a secure hashing algorithm. 
 * **Client-Side Hashing**: The student's device hashes the OTP code before transmitting it.
 * **Backend Validation**: The Go backend verifies and validates the hashed value rather than raw texts, blocking requests from being intercepted and replayed manually.
