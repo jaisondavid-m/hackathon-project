@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Shield, 
-  ShieldCheck, 
-  QrCode, 
-  ArrowLeft, 
-  Timer, 
-  Delete, 
-  CheckCircle, 
-  AlertTriangle, 
-  Loader2, 
-  Camera, 
-  X, 
-  RefreshCw 
+import {
+  Shield,
+  ShieldCheck,
+  QrCode,
+  ArrowLeft,
+  Timer,
+  Delete,
+  CheckCircle,
+  AlertTriangle,
+  Loader2,
+  Camera,
+  X,
+  RefreshCw
 } from 'lucide-react';
 import { attendanceService } from '../../api/attendance';
 
@@ -69,7 +69,7 @@ function OTPAttendance() {
     if (!canResend) return;
     setSubmitSuccess('');
     setSubmitError('');
-    
+
     // Simulate code resend success
     setSubmitSuccess('A new secure verification code has been sent to your email.');
     setCountdown(30);
@@ -77,7 +77,7 @@ function OTPAttendance() {
 
   const handleInputChange = (index, value) => {
     const cleanValue = value.replace(/\D/g, '').substring(0, 1);
-    
+
     setOtpValues((prev) => {
       const next = [...prev];
       next[index] = cleanValue;
@@ -115,14 +115,14 @@ function OTPAttendance() {
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').trim().replace(/\D/g, '').substring(0, 6);
-    
+
     if (pastedData) {
       const nextValues = [...otpValues];
       for (let i = 0; i < 6; i++) {
         nextValues[i] = pastedData[i] || '';
       }
       setOtpValues(nextValues);
-      
+
       const nextFocusIndex = Math.min(pastedData.length, 5);
       inputRefs[nextFocusIndex].current?.focus();
     }
@@ -191,11 +191,11 @@ function OTPAttendance() {
         const { latitude, longitude } = position.coords;
         try {
           const record = await attendanceService.submitOTP(otp, latitude, longitude);
-          
+
           setIsVerified(true);
           setSubmitSuccess(`Attendance marked for ${record.class_id} - Hour ${record.hour_number}!`);
           setOtpValues(['', '', '', '', '', '']);
-          
+
           if (fetchStudentAttendance) {
             await fetchStudentAttendance();
           }
@@ -222,13 +222,13 @@ function OTPAttendance() {
 
   const handleSimulateScan = () => {
     setScanStatus('scanning');
-    
+
     setTimeout(() => {
       const mockScannedOtp = '583921';
       const nextValues = mockScannedOtp.split('');
       setOtpValues(nextValues);
       setScanStatus('success');
-      
+
       setTimeout(() => {
         setShowScanner(false);
         setScanStatus('idle');
@@ -248,12 +248,12 @@ function OTPAttendance() {
       <div className="absolute top-[-10%] left-[-10%] w-[30%] h-[30%] rounded-full bg-[#4F46E5]/5 blur-[80px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-[#7C3AED]/5 blur-[80px] pointer-events-none" />
 
-      {/* Main card wrapper */}
-      <motion.div 
+      {/* Main card wrapper with white background box */}
+      <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="w-full max-w-[500px] bg-white rounded-3xl border border-slate-100/80 shadow-lg p-5 sm:p-6 z-10 my-auto"
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full max-w-[420px] bg-white rounded-3xl border border-slate-200/60 shadow-lg p-5 sm:p-6 z-10 my-auto"
       >
         <AnimatePresence mode="wait">
           {!isVerified ? (
@@ -262,56 +262,53 @@ function OTPAttendance() {
               initial={{ opacity: 1 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="space-y-4"
+              className="space-y-3"
             >
-              {/* Back Button */}
-              <button 
-                onClick={() => navigate('/student/history')}
-                className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 hover:text-[#4F46E5] transition-colors cursor-pointer group"
-              >
-                <ArrowLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
-                <span>Back to Dashboard</span>
-              </button>
-
-              {/* Header */}
-              <div className="flex flex-col items-center text-center space-y-2">
-                <motion.div 
-                  animate={{ scale: [1, 1.04, 1] }}
-                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                  className="p-2 bg-[#4F46E5]/10 text-[#4F46E5] rounded-xl"
+              {/* Back Button & Header Row */}
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => navigate('/student/history')}
+                  className="flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-[#4F46E5] transition-colors cursor-pointer group"
                 >
-                  <Shield size={24} className="stroke-[2]" />
-                </motion.div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight leading-none">
-                  Enter Verification Code
-                </h2>
+                  <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
+                  <span>Back</span>
+                </button>
+
+                <div className="flex items-center gap-1.5">
+                  <div className="p-1 bg-[#4F46E5]/10 text-[#4F46E5] rounded-lg">
+                    <Shield size={14} className="stroke-[2]" />
+                  </div>
+                  <h2 className="text-sm font-extrabold text-slate-800 tracking-tight">
+                    Verification Code
+                  </h2>
+                </div>
               </div>
 
               {/* Alerts */}
               {submitError && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="p-2.5 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-[11px] font-semibold flex items-center gap-2 shadow-xs"
+                  className="p-2 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs"
                 >
-                  <AlertTriangle size={14} className="flex-shrink-0" />
+                  <AlertTriangle size={13} className="flex-shrink-0" />
                   <span>{submitError}</span>
                 </motion.div>
               )}
 
               {submitSuccess && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[11px] font-semibold flex items-center gap-2 shadow-xs"
+                  className="p-2 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs"
                 >
-                  <CheckCircle size={14} className="flex-shrink-0" />
+                  <CheckCircle size={13} className="flex-shrink-0" />
                   <span>{submitSuccess}</span>
                 </motion.div>
               )}
 
               {/* OTP Input Boxes */}
-              <div className="flex justify-between items-center gap-1.5 xs:gap-2 py-1">
+              <div className="flex justify-center items-center gap-2 py-0.5">
                 {otpValues.map((val, idx) => (
                   <motion.input
                     key={idx}
@@ -323,75 +320,69 @@ function OTPAttendance() {
                     onKeyDown={(e) => handleKeyDown(idx, e)}
                     onPaste={idx === 0 ? handlePaste : undefined}
                     disabled={submitLoading}
-                    className="w-10 h-10 xs:w-12 xs:h-12 sm:w-[58px] sm:h-[58px] bg-white border border-[#D1D5DB] rounded-xl text-center text-lg sm:text-xl font-extrabold text-slate-800 transition-all focus:outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-[#4F46E5]/10 disabled:opacity-50 disabled:bg-slate-50"
-                    whileFocus={{ scale: 1.05 }}
+                    className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-slate-200 rounded-xl text-center text-base sm:text-lg font-extrabold text-slate-800 transition-all focus:outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-[#4F46E5]/10 disabled:opacity-50"
+                    whileFocus={{ scale: 1.04 }}
                   />
                 ))}
               </div>
 
-              {/* Numeric Keypad */}
-              <div className="grid grid-cols-3 gap-2 pt-1">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'Clear', 0, 'Delete'].map((val) => {
-                  const isSpecial = val === 'Clear' || val === 'Delete';
-                  return (
-                    <motion.button
-                      key={val}
-                      type="button"
-                      onClick={() => handleKeypadPress(val)}
-                      disabled={submitLoading}
-                      className={`h-[46px] rounded-xl font-bold text-sm flex items-center justify-center cursor-pointer transition-all border ${
-                        isSpecial
-                          ? 'bg-slate-50/80 border-slate-200 text-slate-500 hover:bg-slate-100'
-                          : 'bg-white border-[#E5E7EB] text-slate-800 hover:bg-slate-50 shadow-xs'
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {val === 'Delete' ? <Delete size={16} /> : <span>{val}</span>}
-                    </motion.button>
-                  );
-                })}
+              {/* Numeric Keypad with Dedicated Background Container */}
+              <div className="p-3 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'Clear', 0, 'Delete'].map((val) => {
+                    const isSpecial = val === 'Clear' || val === 'Delete';
+                    return (
+                      <motion.button
+                        key={val}
+                        type="button"
+                        onClick={() => handleKeypadPress(val)}
+                        disabled={submitLoading}
+                        className={`h-9 sm:h-10 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center cursor-pointer transition-all border ${
+                          isSpecial
+                            ? 'bg-slate-50 border-slate-200/80 text-slate-500 hover:bg-slate-100'
+                            : 'bg-white border-slate-200/60 text-slate-800 hover:bg-slate-50'
+                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {val === 'Delete' ? <Delete size={14} /> : <span>{val}</span>}
+                      </motion.button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Primary Button */}
+              {/* Primary Verification Button */}
               <motion.button
                 type="button"
                 onClick={handleVerify}
                 disabled={submitLoading || otp.length !== 6}
-                className="w-full h-11 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white font-extrabold text-xs tracking-wider uppercase rounded-xl shadow-md shadow-[#4F46E5]/15 hover:shadow-lg hover:shadow-[#4F46E5]/25 cursor-pointer disabled:from-slate-100 disabled:to-slate-100 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full h-10 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white font-extrabold text-xs tracking-wider uppercase rounded-xl shadow-md shadow-[#4F46E5]/15 hover:shadow-lg hover:shadow-[#4F46E5]/25 cursor-pointer disabled:from-slate-100 disabled:to-slate-100 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
                 {submitLoading ? (
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={15} className="animate-spin" />
                 ) : (
                   <>
-                    <ShieldCheck size={16} />
+                    <ShieldCheck size={15} />
                     <span>Verify & Continue</span>
                   </>
                 )}
               </motion.button>
 
-              {/* Divider */}
-              <div className="flex items-center gap-3 py-1 select-none">
-                <div className="flex-grow h-px bg-[#E5E7EB]" />
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">or</span>
-                <div className="flex-grow h-px bg-[#E5E7EB]" />
-              </div>
-
-              {/* Secondary Button */}
+              {/* Scan QR Code Secondary Button */}
               <motion.button
                 type="button"
                 onClick={() => setShowScanner(true)}
                 disabled={submitLoading}
-                className="w-full h-[42px] bg-white border border-[#4F46E5] text-[#4F46E5] hover:bg-[#4F46E5]/5 font-bold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                className="w-full h-9 bg-white border border-[#4F46E5]/30 text-[#4F46E5] hover:bg-[#4F46E5]/5 font-bold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
-                <QrCode size={14} />
+                <QrCode size={13} />
                 <span>Scan QR Code</span>
               </motion.button>
-
 
             </motion.div>
           ) : (
@@ -403,17 +394,17 @@ function OTPAttendance() {
               className="flex flex-col items-center justify-center text-center py-12 space-y-3"
             >
               <svg className="w-16 h-16 text-[#10B981]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <motion.path 
+                <motion.path
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  d="M22 11.08V12a10 10 0 1 1-5.93-9.14" 
+                  d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
                 />
-                <motion.path 
+                <motion.path
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 0.5, delay: 0.6 }}
-                  d="M22 4L12 14.01l-3-3" 
+                  d="M22 4L12 14.01l-3-3"
                 />
               </svg>
 
@@ -432,7 +423,7 @@ function OTPAttendance() {
       <AnimatePresence>
         {showScanner && (
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex justify-center items-center z-50 p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -460,7 +451,7 @@ function OTPAttendance() {
                 <div className="w-56 h-56 bg-slate-950 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border-4 border-slate-800 shadow-inner">
                   {scanStatus === 'scanning' ? (
                     <>
-                      <motion.div 
+                      <motion.div
                         animate={{ top: ['0%', '100%', '0%'] }}
                         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                         className="absolute left-0 right-0 h-0.5 bg-red-500 shadow-[0_0_10px_1.5px_rgba(239,68,68,0.8)] z-20 pointer-events-none"
@@ -472,7 +463,7 @@ function OTPAttendance() {
                       </div>
                     </>
                   ) : scanStatus === 'success' ? (
-                    <motion.div 
+                    <motion.div
                       initial={{ scale: 0.8 }}
                       animate={{ scale: 1 }}
                       className="text-center text-emerald-400 font-extrabold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1.5"
