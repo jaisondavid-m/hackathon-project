@@ -3,6 +3,7 @@
 ### 🚀 Hackathon Project Reference
 
 > **🌐 Live Demo:** [https://pcdp-v4.bitsathy.in](https://pcdp-v4.bitsathy.in/)
+> ⚠️ Note: Please use your personal internet connection (mobile data or personal hotspot). Do not use the organization's/campus network, as it may block or affect access.
 
 ---
 
